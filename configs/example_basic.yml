@@ -1,0 +1,51 @@
+# Basic Configuration Example
+# Primary-Backup protocol with 3 backups
+
+simulation:
+  seed: 42                    # For reproducibility
+  duration_seconds: 10        # Max simulation time (optional)
+  output_file: "output/simulation_results.csv"
+
+network:
+  latency_min: 0.5           # Microseconds (datacenter scale!)
+  latency_max: 2.0
+  packet_loss_prob: 0.0      # 0% packet loss
+
+# Node Configuration
+nodes:
+  # Client node
+  - id: 99
+    type: "ClientNode"
+  
+  # Primary node
+  - id: 0
+    type: "PrimaryNode"
+    protocol: "primary_backup"
+    config:
+      backup_ids: [1, 2, 3]   # Which nodes are backups
+  
+  # Backup nodes
+  - id: 1
+    type: "BackupNode"
+    protocol: "primary_backup"
+  
+  - id: 2
+    type: "BackupNode"
+    protocol: "primary_backup"
+  
+  - id: 3
+    type: "BackupNode"
+    protocol: "primary_backup"
+
+# Workload Configuration
+workload:
+  type: "sequential"          # Send requests one after another
+  client_id: 99
+  target_id: 0
+  requests:
+    - payload: "Request_A"
+      delay: 0.0              # Send immediately
+    - payload: "Request_B"
+      delay: 0.0
+    - payload: "Request_C"
+      delay: 0.0

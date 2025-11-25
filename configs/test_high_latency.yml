@@ -1,0 +1,28 @@
+simulation:
+  seed: 100
+  output_file: "output/test_high_latency.csv"
+
+network:
+  latency_min: 10.0
+  latency_max: 20.0
+  packet_loss_prob: 0.0
+
+nodes:
+  - id: 99
+    type: "ClientNode"
+  - id: 0
+    type: "PrimaryNode"
+    config:
+      backup_ids: [1]
+  - id: 1
+    type: "BackupNode"
+
+workload:
+  type: "sequential"
+  client_id: 99
+  target_id: 0
+  requests:
+    - payload: "Slow_Req_1"
+      delay: 0.0
+    - payload: "Slow_Req_2"
+      delay: 0.0

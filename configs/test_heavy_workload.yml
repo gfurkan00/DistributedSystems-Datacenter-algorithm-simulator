@@ -1,0 +1,46 @@
+simulation:
+  seed: 300
+  output_file: "output/test_heavy_workload.csv"
+
+network:
+  latency_min: 0.1
+  latency_max: 0.2
+  packet_loss_prob: 0.0
+
+nodes:
+  - id: 99
+    type: "ClientNode"
+  - id: 0
+    type: "PrimaryNode"
+    config:
+      backup_ids: [1, 2]
+  - id: 1
+    type: "BackupNode"
+  - id: 2
+    type: "BackupNode"
+
+workload:
+  type: "sequential"
+  client_id: 99
+  target_id: 0
+  requests:
+    - payload: "R1"
+      delay: 0.0
+    - payload: "R2"
+      delay: 0.0
+    - payload: "R3"
+      delay: 0.0
+    - payload: "R4"
+      delay: 0.0
+    - payload: "R5"
+      delay: 0.0
+    - payload: "R6"
+      delay: 0.0
+    - payload: "R7"
+      delay: 0.0
+    - payload: "R8"
+      delay: 0.0
+    - payload: "R9"
+      delay: 0.0
+    - payload: "R10"
+      delay: 0.0
