@@ -3,5 +3,6 @@ __pycache__/
 *.csv
 3299869.3319893.pdf
 DS_group_project.pdf
-nano-consensus-preprint.pdf
 .idea
+.idea.archive/
+output/

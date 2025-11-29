@@ -8,12 +8,11 @@ from src.core.node.client_node import ClientNode
 from src.core.node.node import Node
 from src.core.utils.utils import MessageType
 
-# NUOVI IMPORT
 from src.config.config_loader import ConfigLoader
 from src.core.node.node_factory import NodeFactory
 
 def core(configuration_file: str) -> None:
-    # 1. Carica Configurazione
+    # 1. Load Configuration
     print(f"Loading configuration from {configuration_file}...")
     config = ConfigLoader.load(configuration_file)
 
@@ -32,34 +31,31 @@ def core(configuration_file: str) -> None:
         latency_max=config.network.latency_max
     )
 
-    # 5. Creazione Nodi Dinamica
+    # 5. Dynamic Node Creation
     nodes: Dict[int, Node] = {}
-    client_node = None  # Variabile per il client
+    client_node = None
 
     for node_cfg in config.nodes:
-        # Usa la Factory!
         node = NodeFactory.create(node_cfg, network)
         nodes[node.node_id] = node
 
-        # Registra nella rete
+        # Register node in the network
         network.register_node(node.node_id, node.receive)
         
-        # Se è il client del workload, salviamolo
+        # Save client node for workload execution
         if node.node_id == config.workload.client_id:
             client_node = node
 
-    # Check di sicurezza: Se c'è un workload ma il client non esiste -> Errore!
+    # Safety check: If workload exists but client is missing -> Error
     if config.workload.requests and client_node is None:
         raise ValueError(f"Workload client_id {config.workload.client_id} not found among created nodes! Check your YAML config.")
 
-    # 6. Esegui Workload
+    # 6. Execute Workload
     if client_node and config.workload.requests:
         print(f"Starting workload with {len(config.workload.requests)} requests...")
         target_id = config.workload.target_id
         
         for req in config.workload.requests:
-            # Per ora inviamo direttamente (ignorando il delay per semplicità)
-            # In futuro useremo lo scheduler per rispettare req.delay
             client_node.send(
                 dst_id=target_id,
                 msg_type=MessageType.CLIENT_REQUEST,
@@ -70,7 +66,6 @@ def core(configuration_file: str) -> None:
     scheduler.run()
 
     # 8. Save Logs
-    # Usa il path dal config se presente, altrimenti default
     output_path = config.output_file if config.output_file else "simulation_results.csv"
     logger.dump_to_csv(output_path)
     print(f"Logs saved to {output_path}")

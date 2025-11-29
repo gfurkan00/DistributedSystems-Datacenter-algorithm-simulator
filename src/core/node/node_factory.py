@@ -18,8 +18,6 @@ class NodeFactory:
             return ClientNode(node_id, network)
             
         elif node_type == "PrimaryNode":
-            # PrimaryNode ha bisogno di backup_ids dal config!
-            # config.config è il dizionario opzionale
             backup_ids = []
             if config.config and "backup_ids" in config.config:
                 backup_ids = config.config["backup_ids"]

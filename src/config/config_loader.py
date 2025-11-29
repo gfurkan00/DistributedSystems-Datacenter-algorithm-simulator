@@ -13,27 +13,27 @@ class ConfigLoader:
             data = yaml.safe_load(f)
             sim_data = data["simulation"]
             net_data = data["network"]
-            node_data_list = data["nodes"]  # È una lista!
+            node_data_list = data["nodes"]
             work_data = data["workload"]
 
             # 1. Network Config
             network = NetworkConfig(
                 latency_min=net_data["latency_min"],
                 latency_max=net_data["latency_max"],
-                packet_loss_prob=net_data.get("packet_loss_prob", 0.0), # Usa get con default
+                packet_loss_prob=net_data.get("packet_loss_prob", 0.0),
             )
 
-            # 2. Node Configs (Loop sulla lista!)
+            # 2. Node Configs
             nodes = []
             for node_dict in node_data_list:
                 nodes.append(NodeConfig(
                     id=node_dict["id"],
                     type=node_dict["type"],
-                    protocol=node_dict.get("protocol"), # Opzionale
-                    config=node_dict.get("config"),     # Opzionale
+                    protocol=node_dict.get("protocol"),
+                    config=node_dict.get("config"),
                 ))
                 
-            # 3. Workload Config (Gestione requests opzionale)
+            # 3. Workload Config
             requests = None
             if "requests" in work_data:
                 requests = [RequestConfig(**req) for req in work_data["requests"]]
@@ -46,7 +46,7 @@ class ConfigLoader:
                 num_requests=work_data.get("num_requests"),
             )
             
-            # 4. Simulation Config Finale
+            # 4. Simulation Config
             return SimulationConfig(
                 seed=sim_data["seed"],
                 duration_seconds=sim_data.get("duration_seconds"),
