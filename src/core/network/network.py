@@ -28,7 +28,20 @@ class Network(NetworkAPI):
         latency = self._get_latency()
         self._scheduler.schedule_event(delay=latency, callback=lambda msg: self._on_receive(message=msg), message=message)
 
-    def send_sync(self, message: Message, sync_latency: float = 0.5):
+    def send_sync(self, message: Message, sync_latency: float = 0.5, violation_probability: float = 0.0):
+        #TODO: o drop o arriva molto in ritardo
+        if random.random() < violation_probability:
+            self._logger.log(
+                timestamp=self._scheduler.now(),
+                source_node_id=message.src_id,
+                event_type=EventType.DROP,
+                dest_node_id=message.dst_id,
+                request_id=message.id,
+                message_type=message.msg_type,
+                payload=message.payload,
+            )
+            return
+
         self._scheduler.schedule_event(delay=sync_latency, callback=lambda msg: self._on_receive(message=msg), message=message)
 
     def _on_receive(self, message: Message):

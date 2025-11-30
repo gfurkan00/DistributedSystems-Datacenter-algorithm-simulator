@@ -18,9 +18,9 @@ class Node(ABC):
         message = MessageFactory.build_message(src_id=self._node_id, dst_id=dst_id, msg_type=msg_type, payload=payload)
         self._network.send(message=message)
 
-    def send_sync(self, dst_id: int, msg_type: MessageType, payload: Any, sync_latency: float = 0.5):
+    def send_sync(self, dst_id: int, msg_type: MessageType, payload: Any, sync_latency: float = 0.5, violation_probability: float = 0.0):
         message = MessageFactory.build_message(src_id=self._node_id, dst_id=dst_id, msg_type=msg_type, payload=payload)
-        self._network.send_sync(message=message, sync_latency=sync_latency)
+        self._network.send_sync(message=message, sync_latency=sync_latency, violation_probability=violation_probability)
 
     @abstractmethod
     def receive(self, msg: Message):

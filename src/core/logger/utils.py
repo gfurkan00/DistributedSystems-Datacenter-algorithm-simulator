@@ -8,6 +8,7 @@ from src.core.utils import MessageType
 class EventType(Enum):
     SEND = "send"
     RECEIVE = "receive"
+    DROP = "drop"
 
 
 @dataclass

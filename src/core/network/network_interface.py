@@ -18,5 +18,5 @@ class NetworkAPI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def send_sync(self, message: Message, sync_latency: float = 0.5) -> None:
+    def send_sync(self, message: Message, sync_latency: float = 0.5, violation_probability: float = 0.0) -> None:
         raise NotImplementedError

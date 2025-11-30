@@ -7,7 +7,7 @@ from src.protocols.lowi.utils import LowiState, LowiPayload
 
 
 class LowiNode(Node):
-    def __init__(self, node_id: int, network: NetworkAPI, all_nodes: List[int]):
+    def __init__(self, node_id: int, network: NetworkAPI, all_nodes: List[int], loop_leader_period: float, timeout_follower_period: float, timeout_limit: float, sync_latency: float, violation_synchronous_probability: float):
         super().__init__(node_id, network)
         self._all_nodes = sorted(all_nodes)
         self._state = LowiState(current_leader_id=self._all_nodes[0])
@@ -15,13 +15,15 @@ class LowiNode(Node):
         #Dictionary with request_id as key and client_id who sent request as value
         self._pending_client_requests: Dict[str, int] = {}
 
-        self._loop_leader_period = 0.2
-        self._timeout_follower_period = 0.5
+        self._loop_leader_period = loop_leader_period
+        self._timeout_follower_period = timeout_follower_period
 
-        self._timeout_limit = 2.5
+        self._timeout_limit = timeout_limit
+        self._sync_latency = sync_latency
+
+        self._violation_synchronous_probability = violation_synchronous_probability
+
         self._last_leader_contact_follower_time = 0.0
-
-        self._sync_latency = 0.1
 
         self._schedule_next_timeout_check()
         if self.is_leader:
@@ -91,7 +93,7 @@ class LowiNode(Node):
         for dst_id in self._all_nodes:
             if dst_id != self._node_id:
                 print(f"Node {self._node_id} send PROPOSE {payload.data} to {dst_id}. Is heartbeat? {payload.is_heartbeat}")
-                self.send_sync(dst_id=dst_id, msg_type=MessageType.PROPOSE, payload=payload, sync_latency=self._sync_latency)
+                self.send_sync(dst_id=dst_id, msg_type=MessageType.PROPOSE, payload=payload, sync_latency=self._sync_latency, violation_probability=self._violation_synchronous_probability)
 
 
     def _send_client_response(self, request_id: str, status: Status):
@@ -106,7 +108,7 @@ class LowiNode(Node):
 
         print(f"Node {self._node_id} receive PROPOSE from {msg.src_id}. Is heartbeat? {payload.is_heartbeat}")
 
-        if sender != self._state.current_leader_id:
+        if sender > self._state.current_leader_id:
             self._switch_leader(sender, now)
 
         if sender == self._state.current_leader_id:
@@ -147,7 +149,7 @@ class LowiNode(Node):
     def _schedule_next_loop_tick(self):
         if not self.is_leader:
             return
-        self.send_sync(dst_id=self._node_id, msg_type=MessageType.LOOP_TICK, payload=None, sync_latency=self._loop_leader_period)
+        self.send_sync(dst_id=self._node_id, msg_type=MessageType.LOOP_TICK, payload=None, sync_latency=self._loop_leader_period, violation_probability=0.0)
 
     def _schedule_next_timeout_check(self):
-        self.send_sync(dst_id=self._node_id, msg_type=MessageType.TIMEOUT_CHECK, payload=None, sync_latency=self._timeout_follower_period)
+        self.send_sync(dst_id=self._node_id, msg_type=MessageType.TIMEOUT_CHECK, payload=None, sync_latency=self._timeout_follower_period, violation_probability=0.0)
