@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from src.core.node.node import Node
 from src.core.network import NetworkAPI
-from src.core.utils import Message, MessageType
+from src.core.utils import Message, MessageType, ClientResponsePayload, Status
 from src.protocols.primary_backup.utils import PendingRequest, ReplicationPayload
 
 
@@ -32,7 +32,7 @@ class PrimaryNode(Node):
 
             if len(pending_request.acks) >= len(self._backup_ids):
                 client_id = pending_request.client_id
-                response_payload = {"request_id": request_id, "status": "committed"}
+                response_payload: ClientResponsePayload = ClientResponsePayload(request_id=request_id, status=Status.SUCCESS)
                 self.send(client_id, MessageType.CLIENT_RESPONSE, response_payload)
 
                 del self._pending_request_dict[request_id]

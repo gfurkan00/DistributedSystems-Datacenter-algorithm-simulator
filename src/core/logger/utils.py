@@ -28,4 +28,4 @@ class LoggerEvent:
         return asdict(self)
 
     def to_str(self) -> str:
-        return f"[Time {self.timestamp}] Source Node Id {self.source_node_id}: {self.event_type} to Dest Node Id {self.dest_node_id} for request {self.request_id} - message type {self.message_type} - payload {self.payload}"
+        return f"[Time {self.timestamp:.3f}] Source Node Id {self.source_node_id}: {self.event_type} to Dest Node Id {self.dest_node_id} for request {self.request_id} - message type {self.message_type} - payload {self.payload}"

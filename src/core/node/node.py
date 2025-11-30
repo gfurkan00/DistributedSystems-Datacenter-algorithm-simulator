@@ -1,5 +1,3 @@
-import random
-
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -19,6 +17,10 @@ class Node(ABC):
     def send(self, dst_id: int, msg_type: MessageType, payload: Any):
         message = MessageFactory.build_message(src_id=self._node_id, dst_id=dst_id, msg_type=msg_type, payload=payload)
         self._network.send(message=message)
+
+    def send_sync(self, dst_id: int, msg_type: MessageType, payload: Any, sync_latency: float = 0.5):
+        message = MessageFactory.build_message(src_id=self._node_id, dst_id=dst_id, msg_type=msg_type, payload=payload)
+        self._network.send_sync(message=message, sync_latency=sync_latency)
 
     @abstractmethod
     def receive(self, msg: Message):

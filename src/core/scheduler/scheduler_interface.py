@@ -14,5 +14,5 @@ class SchedulerAPI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def run(self) -> None:
+    def run(self, duration: float = 100) -> None:
         raise NotImplementedError

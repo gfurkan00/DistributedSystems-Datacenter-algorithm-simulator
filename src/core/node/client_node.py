@@ -1,7 +1,7 @@
 
 from .node import Node
 from src.core.network import NetworkAPI
-from src.core.utils import Message, MessageType
+from src.core.utils import Message, MessageType, ClientResponsePayload
 
 
 class ClientNode(Node):
@@ -10,4 +10,5 @@ class ClientNode(Node):
 
     def receive(self, msg: Message):
         if msg.msg_type == MessageType.CLIENT_RESPONSE:
-            print(f"Client node {self._node_id} receive response from node {msg.src_id}")
+            payload: ClientResponsePayload = msg.payload
+            print(f"Client node {self._node_id} receive response from node {msg.src_id}, with payload {payload}")

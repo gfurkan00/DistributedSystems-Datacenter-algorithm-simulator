@@ -4,10 +4,18 @@ from typing import Any, Callable
 
 
 class MessageType(Enum):
+    #Client
     CLIENT_REQUEST = "client_request"
     CLIENT_RESPONSE = "client_response"
+
+    #Primary Backup protocol
     REPLICATION = "replication"
     ACK = "ack"
+
+    #Lowi
+    LOOP_TICK = "loop_tick"
+    TIMEOUT_CHECK = "timeout_check"
+    PROPOSE = "propose"
 
 
 @dataclass
@@ -17,6 +25,17 @@ class Message:
     dst_id: int
     msg_type: MessageType
     payload: Any
+
+
+
+class Status(Enum):
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+@dataclass
+class ClientResponsePayload:
+    request_id: str
+    status: Status
 
 
 @dataclass

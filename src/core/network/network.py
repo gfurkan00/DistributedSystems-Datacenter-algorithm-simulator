@@ -18,12 +18,18 @@ class Network(NetworkAPI):
         self._latency_min = latency_min
         self._latency_max = latency_max
 
+    def now(self) -> float:
+        return self._scheduler.now()
+
     def register_node(self, node_id: int, receiver_callback: Callable[[Message], None]):
         self._nodes[node_id] = receiver_callback
 
     def send(self, message: Message):
-        latency = self._get_latency(message.src_id, message.dst_id)
+        latency = self._get_latency()
         self._scheduler.schedule_event(delay=latency, callback=lambda msg: self._on_receive(message=msg), message=message)
+
+    def send_sync(self, message: Message, sync_latency: float = 0.5):
+        self._scheduler.schedule_event(delay=sync_latency, callback=lambda msg: self._on_receive(message=msg), message=message)
 
     def _on_receive(self, message: Message):
         callback = self._nodes.get(message.dst_id)
@@ -41,5 +47,5 @@ class Network(NetworkAPI):
         )
         callback(message)
 
-    def _get_latency(self, src_id: int, dst_id: int) -> float:
+    def _get_latency(self) -> float:
         return random.uniform(self._latency_min, self._latency_max)

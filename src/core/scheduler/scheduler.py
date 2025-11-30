@@ -34,12 +34,13 @@ class Scheduler(SchedulerAPI):
             payload=message.payload,
         )
 
-    def run(self) -> None:
+    def run(self, duration: float = 100) -> None:
         print("Simulation Started")
 
-        while self._events:
+        while self._events and duration > 0:
             current_event = heapq.heappop(self._events)
             self._now = current_event.delivery_time
             current_event.callback(current_event.message)
+            duration -= 1
 
         print("Simulation Ended")
