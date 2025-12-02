@@ -31,6 +31,9 @@ class Logger(LoggerAPI):
         )
         self._logs.append(logger_event)
 
+    def get_logs(self) -> List[LoggerEvent]:
+        return self._logs
+
     def print(self):
         for log in self._logs:
             print(log.to_str())

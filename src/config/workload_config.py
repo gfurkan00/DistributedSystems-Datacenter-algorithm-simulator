@@ -1,17 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional,List
-
-@dataclass
-class RequestConfig:
-    payload: str
-    delay: float
-
-
+from typing import List
 
 @dataclass
 class WorkloadConfig:
-    type: str
-    client_id: int
+    clients: List[int]
     target_id: int
-    requests: Optional[list[RequestConfig]] = None
-    num_requests: Optional[int] = None
+    num_requests: int

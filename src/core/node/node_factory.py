@@ -1,31 +1,28 @@
-from typing import Dict, Any, Type
+from typing import Dict, Any, Callable
 from src.core.node.node import Node
-from src.core.node.client_node import ClientNode
-from src.protocols.primary_backup.primary_node import PrimaryNode
-from src.protocols.primary_backup.backup_node import BackupNode
 from src.config.node_config import NodeConfig
 from src.core.network.network import NetworkAPI
 
+NodeBuilder = Callable[[int, NetworkAPI, Dict[str, Any]], Node]
+
 class NodeFactory:
-    """Factory to create nodes based on configuration."""
     
-    @staticmethod
-    def create(config: NodeConfig, network: NetworkAPI) -> Node:
+    _builders: Dict[str, NodeBuilder] = {}
+
+    @classmethod
+    def register(cls, node_type: str, builder: NodeBuilder) -> None:
+        cls._builders[node_type] = builder
+
+    @classmethod
+    def create(cls, config: NodeConfig, network: NetworkAPI) -> Node:
         node_type = config.type
-        node_id = config.id
         
-        if node_type == "ClientNode":
-            return ClientNode(node_id, network)
+        if node_type not in cls._builders:
+            known_types = list(cls._builders.keys())
+            raise ValueError(f"Unknown node type: '{node_type}'. Registered types: {known_types}")
             
-        elif node_type == "PrimaryNode":
-            backup_ids = []
-            if config.config and "backup_ids" in config.config:
-                backup_ids = config.config["backup_ids"]
-            
-            return PrimaryNode(node_id, network, backup_ids)
-            
-        elif node_type == "BackupNode":
-            return BackupNode(node_id, network)
-            
-        else:
-            raise ValueError(f"Unknown node type: {node_type}")
+        builder = cls._builders[node_type]
+        
+        extra_config = config.config if config.config else {}
+        
+        return builder(config.id, network, extra_config)

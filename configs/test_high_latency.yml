@@ -18,11 +18,6 @@ nodes:
     type: "BackupNode"
 
 workload:
-  type: "sequential"
-  client_id: 99
+  clients: [99]
   target_id: 0
-  requests:
-    - payload: "Slow_Req_1"
-      delay: 0.0
-    - payload: "Slow_Req_2"
-      delay: 0.0
+  num_requests: 2

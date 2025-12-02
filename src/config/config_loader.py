@@ -3,7 +3,7 @@ from typing import Dict, Any
 from .simulation_config import SimulationConfig
 from .network_config import NetworkConfig
 from .node_config import NodeConfig
-from .workload_config import WorkloadConfig, RequestConfig
+from .workload_config import WorkloadConfig
 
 class ConfigLoader:
     
@@ -16,14 +16,12 @@ class ConfigLoader:
             node_data_list = data["nodes"]
             work_data = data["workload"]
 
-            # 1. Network Config
             network = NetworkConfig(
                 latency_min=net_data["latency_min"],
                 latency_max=net_data["latency_max"],
                 packet_loss_prob=net_data.get("packet_loss_prob", 0.0),
             )
 
-            # 2. Node Configs
             nodes = []
             for node_dict in node_data_list:
                 nodes.append(NodeConfig(
@@ -33,20 +31,12 @@ class ConfigLoader:
                     config=node_dict.get("config"),
                 ))
                 
-            # 3. Workload Config
-            requests = None
-            if "requests" in work_data:
-                requests = [RequestConfig(**req) for req in work_data["requests"]]
-            
             workload = WorkloadConfig(
-                type=work_data["type"],
-                client_id=work_data["client_id"],
+                clients=work_data["clients"],
                 target_id=work_data["target_id"],
-                requests=requests,
-                num_requests=work_data.get("num_requests"),
+                num_requests=work_data["num_requests"],
             )
             
-            # 4. Simulation Config
             return SimulationConfig(
                 seed=sim_data["seed"],
                 duration_seconds=sim_data.get("duration_seconds"),

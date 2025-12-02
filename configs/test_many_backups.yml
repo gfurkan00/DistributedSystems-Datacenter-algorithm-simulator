@@ -37,9 +37,6 @@ nodes:
     type: "BackupNode"
 
 workload:
-  type: "sequential"
-  client_id: 99
+  clients: [99]
   target_id: 0
-  requests:
-    - payload: "Broadcast_Test"
-      delay: 0.0
+  num_requests: 1
