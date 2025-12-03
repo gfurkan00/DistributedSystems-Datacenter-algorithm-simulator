@@ -1,32 +1,36 @@
-from typing import List, Dict
+from typing import Dict, Any
 
 from src.core.network import NetworkAPI
 from src.core.node import Node
-from src.core.utils import MessageFactory, MessageType, Message, ClientResponsePayload, Status
+from src.core.utils import MessageType, Message, ClientResponsePayload, Status, Oracle
 from src.protocols.lowi.utils import LowiState, LowiPayload
 
 
 class LowiNode(Node):
-    def __init__(self, node_id: int, network: NetworkAPI, all_nodes: List[int], loop_leader_period: float, timeout_follower_period: float, timeout_limit: float, sync_latency: float, violation_synchronous_probability: float):
+    def __init__(self, node_id: int, network: NetworkAPI, settings: Dict[str, Any]):
         super().__init__(node_id, network)
-        self._all_nodes = sorted(all_nodes)
+        self._all_nodes = sorted(settings.get("all_nodes_ids", []))
+        if not self._all_nodes:
+            raise ValueError("All nodes ids must be specified")
+
         self._state = LowiState(current_leader_id=self._all_nodes[0])
 
         #Dictionary with request_id as key and client_id who sent request as value
         self._pending_client_requests: Dict[str, int] = {}
 
-        self._loop_leader_period = loop_leader_period
-        self._timeout_follower_period = timeout_follower_period
+        self._loop_leader_period = settings.get("loop_leader_period", 0.2)
+        self._timeout_follower_period = settings.get("timeout_follower_period", 0.5)
 
-        self._timeout_limit = timeout_limit
-        self._sync_latency = sync_latency
+        self._timeout_limit = settings.get("timeout_limit", 2.5)
+        self._sync_latency = settings.get("sync_latency", 0.1)
 
-        self._violation_synchronous_probability = violation_synchronous_probability
+        self._violation_synchronous_probability = settings.get("violation_synchronous_probability", 0.01)
 
         self._last_leader_contact_follower_time = 0.0
 
         self._schedule_next_timeout_check()
         if self.is_leader:
+            Oracle.set_leader_id(self._node_id)
             self._schedule_next_loop_tick()
 
     @property
@@ -140,6 +144,7 @@ class LowiNode(Node):
 
         if self.is_leader:
             print(f"Node {self._node_id} became leader")
+            Oracle.set_leader_id(self._node_id)
             self._schedule_next_loop_tick()
 
     def _switch_leader(self, new_leader_id: int, now: float):

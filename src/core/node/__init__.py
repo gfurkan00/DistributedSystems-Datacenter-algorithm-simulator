@@ -6,9 +6,10 @@ from .node_factory import NodeFactory
 __all__ = [
     'Node',
     'ClientNode',
+    'NodeFactory'
 ]
 
 def register() -> None:
-    NodeFactory.register("ClientNode", lambda nid, net, cfg: ClientNode(nid, net))
+    NodeFactory.register("ClientNode", lambda node_id, network, settings: ClientNode(node_id=node_id, network=network))
 
 __version__ = '1.0.0'

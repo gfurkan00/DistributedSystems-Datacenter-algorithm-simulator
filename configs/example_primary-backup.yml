@@ -1,0 +1,25 @@
+simulation:
+  seed: 42
+  output_file: "output/example_primary_backup.csv"
+
+network:
+  latency_min: 0.5
+  latency_max: 2.0
+  packet_loss_probability: 0.0
+
+protocol:
+  name: "primary_backup"
+  settings:
+    replication_factor: 3
+  deployment:
+    groups:
+      - role: "PrimaryNode"
+        count: 1
+
+      - role: "BackupNode"
+        count: 5
+
+workload:
+  type: "sequential"
+  clients: 5
+  num_requests_per_client: 5

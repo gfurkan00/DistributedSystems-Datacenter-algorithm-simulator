@@ -27,16 +27,12 @@ class LoggerEvent:
 
     def to_dict(self) -> Dict:
         data = asdict(self)
-        # Clean up Enums for CSV
-        if isinstance(self.event_type, Enum):
-            data['event_type'] = self.event_type.value
-        if isinstance(self.message_type, Enum):
-            data['message_type'] = self.message_type.name
-        # Format timestamp
+        data['event_type'] = self.event_type.value
+        data['message_type'] = self.message_type.name
         data['timestamp'] = f"{self.timestamp:.4f}"
         return data
 
     def to_str(self) -> str:
-        evt = self.event_type.value if isinstance(self.event_type, Enum) else self.event_type
-        msg_type = self.message_type.name if isinstance(self.message_type, Enum) else self.message_type
-        return f"[{self.timestamp:.4f}] Node {self.source_node_id} -> Node {self.dest_node_id} | {evt.upper()} | {msg_type} | Req: {self.request_id} | Payload: {self.payload}"
+        event_type = self.event_type.value
+        msg_type = self.message_type.value
+        return f"[{self.timestamp:.4f}] Node {self.source_node_id} -> Node {self.dest_node_id} | {event_type.upper()} | {msg_type.upper()} | Req: {self.request_id} | Payload: {self.payload}"

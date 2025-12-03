@@ -1,0 +1,26 @@
+simulation:
+  seed: 42
+  output_file: "output/example_lowi.csv"
+
+network:
+  latency_min: 0.5
+  latency_max: 2.0
+  packet_loss_probability: 0.0
+
+protocol:
+  name: "lowi"
+  settings:
+    loop_leader_period: 0.2
+    timeout_follower_period: 0.5
+    timeout_limit: 2.5
+    sync_latency: 0.1
+    violation_probability: 0.001
+  deployment:
+    groups:
+      - role: "LowiNode"
+        count: 100
+
+workload:
+  type: "sequential"
+  clients: 50
+  num_requests_per_client: 2

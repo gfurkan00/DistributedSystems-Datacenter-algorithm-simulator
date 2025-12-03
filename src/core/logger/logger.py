@@ -8,16 +8,8 @@ from ..utils import MessageType
 
 
 class Logger(LoggerAPI):
-    __INSTANCE: LoggerAPI = None
-
     def __init__(self):
         self._logs: List[LoggerEvent] = []
-
-    @classmethod
-    def create(cls) -> LoggerAPI:
-        if cls.__INSTANCE is None:
-            cls.__INSTANCE = cls()
-        return cls.__INSTANCE
 
     def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: int, request_id: str, message_type: MessageType, payload: Any):
         logger_event = LoggerEvent(
@@ -35,8 +27,8 @@ class Logger(LoggerAPI):
         return self._logs
 
     def print(self):
-        for log in self._logs:
-            print(log.to_str())
+        for logger_event in self._logs:
+            print(logger_event.to_str())
 
     def dump_to_csv(self, filename: str):
         if not self._logs:
@@ -47,8 +39,8 @@ class Logger(LoggerAPI):
             with open(filename, mode='w', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=LoggerEvent.fieldnames())
                 writer.writeheader()
-                for log in self._logs:
-                    writer.writerow(log.to_dict())
+                for logger_event in self._logs:
+                    writer.writerow(logger_event.to_dict())
             print(f"Logs successfully written to {filename}")
         except IOError as e:
             print(f"Error writing logs to CSV: {e}")

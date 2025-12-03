@@ -1,21 +1,25 @@
+import os
 import random
-from typing import List, Dict, Any
-
-from src.core.logger.logger import Logger, LoggerAPI
-from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
-from src.core.network.network import Network, NetworkAPI
-from src.core.node.node import Node
-from src.core.utils.utils import MessageType
-
-from src.config.config_loader import ConfigLoader
-from src.core.node.node_factory import NodeFactory
 
 import src.core.node as core_nodes
 import src.protocols.primary_backup as primary_backup
+import src.protocols.lowi as lowi
+
+from src.core.logger.logger import Logger, LoggerAPI
+from src.core.node import ClientNode
+from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
+from src.core.network.network import Network, NetworkAPI
+from src.core.utils import Oracle, NodeIDGenerator
+from src.core.utils.utils import MessageType
+from src.config.config_loader import ConfigLoader
+from src.core.statistics import Statistics
+from src.protocols.topology_factory import TopologyBuilderFactory
+
 
 def register_nodes():
     core_nodes.register()
     primary_backup.register()
+    lowi.register()
 
 def core(configuration_file: str) -> None:
     register_nodes()
@@ -25,48 +29,43 @@ def core(configuration_file: str) -> None:
 
     random.seed(config.seed)
     
-    logger: LoggerAPI = Logger.create()
+    logger: LoggerAPI = Logger()
     scheduler: SchedulerAPI = Scheduler(logger=logger)
     
     network: NetworkAPI = Network(
         scheduler=scheduler, 
         logger=logger, 
-        latency_min=config.network.latency_min, 
-        latency_max=config.network.latency_max
+        latency_min=config.network_config.latency_min,
+        latency_max=config.network_config.latency_max,
+        packet_loss_probability=config.network_config.packet_loss_probability
     )
 
-    nodes: Dict[int, Node] = {}
+    print(f"Building nodes topology for protocol: {config.protocol_config.name}")
+    topology_strategy = TopologyBuilderFactory.get_strategy(config.protocol_config.name)
+    created_nodes_list = topology_strategy.build(network, config.protocol_config)
+    for node in created_nodes_list:
+        network.register_node(node_id=node.node_id, receiver_callback=node.receive)
 
-    for node_cfg in config.nodes:
-        node = NodeFactory.create(node_cfg, network)
-        nodes[node.node_id] = node
 
-        network.register_node(node.node_id, node.receive)
+    if config.workload_config.clients > 0:
+        target_id = Oracle.get_leader_id()
 
-    if config.workload.clients:
-        print(f"Starting workload with {config.workload.num_requests} requests per client...")
-        target_id = config.workload.target_id
-        
-        for client_id in config.workload.clients:
-            if client_id not in nodes:
-                print(f"Warning: Client {client_id} not found in nodes.")
-                continue
-            
-            client = nodes[client_id]
-            for i in range(config.workload.num_requests):
-                payload = f"Req_{client_id}_{i}"
-                client.send(
-                    dst_id=target_id,
-                    msg_type=MessageType.CLIENT_REQUEST,
-                    payload=payload
-                )
+        for _ in range(config.workload_config.clients):
+            client_node_id = NodeIDGenerator.generate()
+            client = ClientNode(node_id=client_node_id, network=network)
+            network.register_node(node_id=client_node_id, receiver_callback=client.receive)
 
-    scheduler.run()
+            for request_id in range(config.workload_config.num_requests_per_client):
+                payload = f"Client_{client_node_id}_Req_{request_id}"
+                client.send(dst_id=target_id, msg_type=MessageType.CLIENT_REQUEST, payload=payload)
 
-    output_path = config.output_file if config.output_file else "simulation_results.csv"
+    scheduler.run(duration=500)
+
+    output_path = config.output_file if config.output_file else "output/simulation.csv"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     logger.dump_to_csv(output_path)
     print(f"Logs saved to {output_path}")
 
-    from src.core.statistics import Statistics
     stats = Statistics(logger.get_logs())
     stats.print_report()
