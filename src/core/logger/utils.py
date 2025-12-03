@@ -27,12 +27,12 @@ class LoggerEvent:
 
     def to_dict(self) -> Dict:
         data = asdict(self)
-        data['event_type'] = self.event_type.value
+        data['event_type'] = self.event_type.name
         data['message_type'] = self.message_type.name
         data['timestamp'] = f"{self.timestamp:.4f}"
         return data
 
     def to_str(self) -> str:
-        event_type = self.event_type.value
-        msg_type = self.message_type.value
+        event_type = self.event_type.name
+        msg_type = self.message_type.name
         return f"[{self.timestamp:.4f}] Node {self.source_node_id} -> Node {self.dest_node_id} | {event_type.upper()} | {msg_type.upper()} | Req: {self.request_id} | Payload: {self.payload}"

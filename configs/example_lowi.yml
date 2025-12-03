@@ -14,13 +14,13 @@ protocol:
     timeout_follower_period: 0.5
     timeout_limit: 2.5
     sync_latency: 0.1
-    violation_probability: 0.001
+    violation_synchronous_probability: 0.01
   deployment:
     groups:
       - role: "LowiNode"
-        count: 100
+        count: 3
 
 workload:
   type: "sequential"
-  clients: 50
+  clients: 1
   num_requests_per_client: 2

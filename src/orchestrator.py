@@ -1,11 +1,8 @@
 import os
 import random
 
-import src.core.node as core_nodes
-import src.protocols.primary_backup as primary_backup
-import src.protocols.lowi as lowi
-
 from src.core.logger.logger import Logger, LoggerAPI
+from src.core.network import register_nodes_into_network
 from src.core.node import ClientNode
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
@@ -15,16 +12,7 @@ from src.config.config_loader import ConfigLoader
 from src.core.statistics import Statistics
 from src.protocols.topology_factory import TopologyBuilderFactory
 
-
-def register_nodes():
-    core_nodes.register()
-    primary_backup.register()
-    lowi.register()
-
 def core(configuration_file: str) -> None:
-    register_nodes()
-
-    print(f"Loading configuration from {configuration_file}...")
     config = ConfigLoader.load(configuration_file)
 
     random.seed(config.seed)
@@ -40,12 +28,9 @@ def core(configuration_file: str) -> None:
         packet_loss_probability=config.network_config.packet_loss_probability
     )
 
-    print(f"Building nodes topology for protocol: {config.protocol_config.name}")
     topology_strategy = TopologyBuilderFactory.get_strategy(config.protocol_config.name)
     created_nodes_list = topology_strategy.build(network, config.protocol_config)
-    for node in created_nodes_list:
-        network.register_node(node_id=node.node_id, receiver_callback=node.receive)
-
+    register_nodes_into_network(network=network, nodes=created_nodes_list)
 
     if config.workload_config.clients > 0:
         target_id = Oracle.get_leader_id()

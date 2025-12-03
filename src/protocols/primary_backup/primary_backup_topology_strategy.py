@@ -1,5 +1,4 @@
 from typing import List
-from src.core.node.node_factory import NodeFactory
 from src.core.node.node import Node
 from src.core.network.network import NetworkAPI
 from src.config.protocol_config import ProtocolConfig
@@ -20,16 +19,15 @@ class PrimaryBackupTopologyStrategy(TopologyStrategy):
         primary_ids = needed_ids[:total_primaries]
         backup_ids = needed_ids[total_primaries:]
 
-        backup_settings = config.settings.copy()
         for backup_id in backup_ids:
-            node = NodeFactory.create(BackupNode.__name__, backup_id, network, backup_settings)
+            node = BackupNode(node_id=backup_id, network=network)
             nodes.append(node)
 
         primary_settings = config.settings.copy()
         primary_settings["backup_ids"] = backup_ids
 
         for primary_id in primary_ids:
-            node = NodeFactory.create(PrimaryNode.__name__, primary_id, network, primary_settings)
+            node = PrimaryNode(node_id=primary_id, network=network, settings=primary_settings)
             nodes.append(node)
 
         return nodes

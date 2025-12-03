@@ -1,5 +1,4 @@
 from typing import List
-from src.core.node.node_factory import NodeFactory
 from src.core.node.node import Node
 from src.core.network.network import NetworkAPI
 from src.config.protocol_config import ProtocolConfig
@@ -23,11 +22,10 @@ class LowiTopologyStrategy(TopologyStrategy):
             for _ in range(group.count):
                 node_id = all_nodes_ids[current_idx]
 
-                node = NodeFactory.create(
-                    node_type=group.role_type,
+                node = LowiNode(
                     node_id=node_id,
                     network=network,
-                    protocol_settings=base_settings
+                    settings=base_settings
                 )
                 nodes.append(node)
                 current_idx += 1
