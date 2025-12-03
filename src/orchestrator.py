@@ -1,48 +1,72 @@
-from src.core.logger import Logger
-from src.core.logger.logger_interface import LoggerAPI
-from src.core.network import Network, NetworkAPI
-from src.core.node import ClientNode
-from src.core.scheduler import Scheduler, SchedulerAPI
-from src.core.utils import MessageType
-from src.protocols.lowi import LowiNode
-from src.protocols.primary_backup import BackupNode, PrimaryNode
+import random
+from typing import List, Dict, Any
 
+from src.core.logger.logger import Logger, LoggerAPI
+from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
+from src.core.network.network import Network, NetworkAPI
+from src.core.node.node import Node
+from src.core.utils.utils import MessageType
+
+from src.config.config_loader import ConfigLoader
+from src.core.node.node_factory import NodeFactory
+
+import src.core.node as core_nodes
+import src.protocols.primary_backup as primary_backup
+
+def register_nodes():
+    core_nodes.register()
+    primary_backup.register()
 
 def core(configuration_file: str) -> None:
+    register_nodes()
+
+    print(f"Loading configuration from {configuration_file}...")
+    config = ConfigLoader.load(configuration_file)
+
+    random.seed(config.seed)
+    
     logger: LoggerAPI = Logger.create()
     scheduler: SchedulerAPI = Scheduler(logger=logger)
-    network: NetworkAPI = Network(scheduler=scheduler, logger=logger, latency_min=0.5, latency_max=2)
+    
+    network: NetworkAPI = Network(
+        scheduler=scheduler, 
+        logger=logger, 
+        latency_min=config.network.latency_min, 
+        latency_max=config.network.latency_max
+    )
 
-    all_lowi_nodes = [0, 1, 2, 3, 4]
+    nodes: Dict[int, Node] = {}
 
-    loop_leader_period = 0.2
-    timeout_follower_period = 0.5
-    timeout_limit = 2.5
-    sync_latency = 0.1
+    for node_cfg in config.nodes:
+        node = NodeFactory.create(node_cfg, network)
+        nodes[node.node_id] = node
 
-    client1 = ClientNode(node_id=99, network=network)
-    client2 = ClientNode(node_id=98, network=network)
+        network.register_node(node.node_id, node.receive)
 
-    leader = LowiNode(node_id=0, network=network, all_nodes=all_lowi_nodes, loop_leader_period=loop_leader_period, timeout_follower_period=timeout_follower_period, timeout_limit=timeout_limit, sync_latency=sync_latency, violation_synchronous_probability=0.001)
-    follower1 = LowiNode(node_id=1, network=network, all_nodes=all_lowi_nodes, loop_leader_period=loop_leader_period, timeout_follower_period=timeout_follower_period, timeout_limit=timeout_limit, sync_latency=sync_latency, violation_synchronous_probability=0.001)
-    follower2 = LowiNode(node_id=2, network=network, all_nodes=all_lowi_nodes, loop_leader_period=loop_leader_period, timeout_follower_period=timeout_follower_period, timeout_limit=timeout_limit, sync_latency=sync_latency, violation_synchronous_probability=0.001)
-    follower3 = LowiNode(node_id=3, network=network, all_nodes=all_lowi_nodes, loop_leader_period=loop_leader_period, timeout_follower_period=timeout_follower_period, timeout_limit=timeout_limit, sync_latency=sync_latency, violation_synchronous_probability=0.001)
-    follower4 = LowiNode(node_id=4, network=network, all_nodes=all_lowi_nodes, loop_leader_period=loop_leader_period, timeout_follower_period=timeout_follower_period, timeout_limit=timeout_limit, sync_latency=sync_latency, violation_synchronous_probability=0.001)
-
-    network.register_node(client1.node_id, client1.receive)
-    network.register_node(client2.node_id, client2.receive)
-
-    network.register_node(leader.node_id, leader.receive)
-    network.register_node(follower1.node_id, follower1.receive)
-    network.register_node(follower2.node_id, follower2.receive)
-    network.register_node(follower3.node_id, follower3.receive)
-    network.register_node(follower4.node_id, follower4.receive)
-
-    #TODO: Se cambia il leader prima che un client invia la request come fa a sapere nuovo leader id
-    client1.send(dst_id=leader.node_id, msg_type=MessageType.CLIENT_REQUEST, payload="A")
-    client2.send(dst_id=leader.node_id, msg_type=MessageType.CLIENT_REQUEST, payload="B")
+    if config.workload.clients:
+        print(f"Starting workload with {config.workload.num_requests} requests per client...")
+        target_id = config.workload.target_id
+        
+        for client_id in config.workload.clients:
+            if client_id not in nodes:
+                print(f"Warning: Client {client_id} not found in nodes.")
+                continue
+            
+            client = nodes[client_id]
+            for i in range(config.workload.num_requests):
+                payload = f"Req_{client_id}_{i}"
+                client.send(
+                    dst_id=target_id,
+                    msg_type=MessageType.CLIENT_REQUEST,
+                    payload=payload
+                )
 
     scheduler.run()
 
-    logger.print()
-    logger.dump_to_csv("lowi_test.csv")
+    output_path = config.output_file if config.output_file else "simulation_results.csv"
+    logger.dump_to_csv(output_path)
+    print(f"Logs saved to {output_path}")
+
+    from src.core.statistics import Statistics
+    stats = Statistics(logger.get_logs())
+    stats.print_report()
