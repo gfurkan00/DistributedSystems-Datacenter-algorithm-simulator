@@ -1,9 +1,12 @@
 import os
 import random
+from typing import List
+
+import src.protocols.primary_backup as primary_backup
+import src.protocols.lowi as lowi
 
 from src.core.logger.logger import Logger, LoggerAPI
-from src.core.network import register_nodes_into_network
-from src.core.node import ClientNode
+from src.core.node import ClientNode, Node
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
 from src.core.utils import Oracle, NodeIDGenerator
@@ -12,7 +15,17 @@ from src.config.config_loader import ConfigLoader
 from src.core.statistics import Statistics
 from src.protocols.topology_factory import TopologyBuilderFactory
 
+def _register_nodes_factories():
+    primary_backup.register()
+    lowi.register()
+
+def register_nodes_into_network(network: NetworkAPI, nodes: List[Node]) -> None:
+    for node in nodes:
+        network.register_node(node_id=node.node_id, receiver_callback=node.receive)
+
 def core(configuration_file: str) -> None:
+    _register_nodes_factories()
+
     config = ConfigLoader.load(configuration_file)
 
     random.seed(config.seed)

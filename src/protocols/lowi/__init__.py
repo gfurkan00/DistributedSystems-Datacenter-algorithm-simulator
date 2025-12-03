@@ -3,8 +3,8 @@ from .lowi_topology_strategy import LowiTopologyStrategy
 
 from src.protocols.topology_factory import TopologyBuilderFactory
 
-
-TopologyBuilderFactory.register(name="lowi", strategy=LowiTopologyStrategy)
+def register():
+    TopologyBuilderFactory.register(name="lowi", strategy=LowiTopologyStrategy)
 
 __all__ = [
     'LowiNode'
