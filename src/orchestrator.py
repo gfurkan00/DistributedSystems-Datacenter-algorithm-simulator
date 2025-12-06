@@ -9,7 +9,7 @@ from src.core.logger.logger import Logger, LoggerAPI
 from src.core.node import ClientNode, Node
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
-from src.core.utils import Oracle, NodeIDGenerator
+from src.core.utils import Oracle, NodeIDTracker
 from src.core.utils.utils import MessageType
 from src.config.config_loader import ConfigLoader
 from src.core.statistics import Statistics
@@ -44,12 +44,13 @@ def core(configuration_file: str) -> None:
     topology_strategy = TopologyBuilderFactory.get_strategy(config.protocol_config.name)
     created_nodes_list = topology_strategy.build(network, config.protocol_config)
     register_nodes_into_network(network=network, nodes=created_nodes_list)
+    print(f"Created {created_nodes_list} nodes")
 
     if config.workload_config.clients > 0:
         target_id = Oracle.get_leader_id()
 
         for _ in range(config.workload_config.clients):
-            client_node_id = NodeIDGenerator.generate()
+            client_node_id = NodeIDTracker.generate_random()
             client = ClientNode(node_id=client_node_id, network=network)
             network.register_node(node_id=client_node_id, receiver_callback=client.receive)
 
@@ -57,9 +58,9 @@ def core(configuration_file: str) -> None:
                 payload = f"Client_{client_node_id}_Req_{request_id}"
                 client.send(dst_id=target_id, msg_type=MessageType.CLIENT_REQUEST, payload=payload)
 
-    scheduler.run(duration=500)
+    scheduler.run(duration=config.duration)
 
-    output_path = config.output_file if config.output_file else "output/simulation.csv"
+    output_path = config.output_file
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     logger.dump_to_csv(output_path)

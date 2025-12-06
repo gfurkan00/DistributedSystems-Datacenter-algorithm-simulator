@@ -4,10 +4,12 @@ from .protocol_config import ProtocolConfig
 from .workload_config import WorkloadConfig
 from typing import Optional
 
+# Utils: Duration is how many events are going to be launched
+
 @dataclass
 class SimulationConfig:
     seed: int
-    duration_seconds: Optional[float]
+    duration: int
     output_file: Optional[str]
     network_config: NetworkConfig
     protocol_config: ProtocolConfig

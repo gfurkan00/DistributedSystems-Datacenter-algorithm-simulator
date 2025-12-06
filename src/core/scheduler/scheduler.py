@@ -34,7 +34,7 @@ class Scheduler(SchedulerAPI):
             payload=message.payload,
         )
 
-    def run(self, duration: float = 100) -> None:
+    def run(self, duration: int = 100) -> None:
         print("Simulation Started")
 
         while self._events and duration > 0:

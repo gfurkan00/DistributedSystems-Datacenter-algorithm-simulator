@@ -16,7 +16,7 @@ class ConfigLoader:
             network_config = NetworkConfig(
                 latency_min=network_data["latency_min"],
                 latency_max=network_data["latency_max"],
-                packet_loss_probability=network_data.get("packet_loss_probability"),
+                packet_loss_probability=network_data["packet_loss_probability"],
             )
 
             protocol_data = data["protocol"]
@@ -24,26 +24,28 @@ class ConfigLoader:
             for node_group in protocol_data["deployment"]["groups"]:
                 node_groups.append(NodeGroupConfig(
                     role_type=node_group["role"],
+                    start_id=node_group.get("start_id"),
                     count=node_group["count"]
                 ))
             protocol_config = ProtocolConfig(
                 name=protocol_data["name"],
-                settings=protocol_data.get("settings", None),
+                settings=protocol_data.get("settings"),
                 node_groups=node_groups,
             )
 
             workload_data = data.get("workload")
             workload_config = WorkloadConfig(
                 type=workload_data.get("type", "sequential"),
+                start_id=workload_data.get("start_id"),
                 clients=workload_data.get("clients", 1),
-                num_requests_per_client=workload_data.get("num_requests_per_client", 5)
+                num_requests_per_client=workload_data.get("num_requests_per_client", 1)
             )
 
             sim_data = data["simulation"]
             return SimulationConfig(
-                seed=sim_data["seed"],
-                output_file=sim_data.get("output_file"),
-                duration_seconds=100,
+                seed=sim_data.get("seed"),
+                output_file=sim_data["output_file"],
+                duration=sim_data["duration"],
                 network_config=network_config,
                 protocol_config=protocol_config,
                 workload_config=workload_config,

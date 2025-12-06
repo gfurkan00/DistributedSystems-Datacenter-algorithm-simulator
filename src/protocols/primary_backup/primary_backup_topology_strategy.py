@@ -2,22 +2,41 @@ from typing import List
 from src.core.node.node import Node
 from src.core.network.network import NetworkAPI
 from src.config.protocol_config import ProtocolConfig
-from src.core.utils import NodeIDGenerator
+from src.core.utils import NodeIDTracker
 from src.protocols.primary_backup import PrimaryNode, BackupNode
 from src.protocols.topology_factory import TopologyStrategy
 
+class MultiplePrimaryNodesError(Exception):
+    pass
 
 class PrimaryBackupTopologyStrategy(TopologyStrategy):
     def build(self, network: NetworkAPI, config: ProtocolConfig) -> List[Node]:
         nodes: List[Node] = []
 
-        total_primaries = sum(group.count for group in config.node_groups if group.role_type == PrimaryNode.__name__)
-        total_backups = sum(group.count for group in config.node_groups if group.role_type == BackupNode.__name__)
+        total_primaries = sum(
+            group.count for group in config.node_groups
+            if group.role_type == PrimaryNode.__name__
+        )
+        if total_primaries > 1:
+            raise MultiplePrimaryNodesError("Configuration file has more than one primary node")
 
-        needed_ids = NodeIDGenerator.generate_many(total_primaries + total_backups)
+        primary_ids: List[int] = []
+        backup_ids: List[int] = []
 
-        primary_ids = needed_ids[:total_primaries]
-        backup_ids = needed_ids[total_primaries:]
+        for group in config.node_groups:
+            if group.role_type not in (PrimaryNode.__name__, BackupNode.__name__):
+                continue
+
+            start_id = group.start_id
+            if start_id is not None:
+                ids = NodeIDTracker.claim_range(start_id, group.count)
+            else:
+                ids = NodeIDTracker.generate_many_random(group.count)
+
+            if group.role_type == BackupNode.__name__:
+                backup_ids.extend(ids)
+            else:
+                primary_ids.extend(ids)
 
         for backup_id in backup_ids:
             node = BackupNode(node_id=backup_id, network=network)

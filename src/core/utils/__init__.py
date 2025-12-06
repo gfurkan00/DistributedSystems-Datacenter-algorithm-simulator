@@ -1,6 +1,6 @@
 from .utils import Message, MessageType, Event, ClientResponsePayload, Status
 from .message_factory import MessageFactory
-from .node_id_generator import NodeIDGenerator
+from .node_id_tracker import NodeIDTracker
 from .oracle import Oracle
 
 __all__ = [
@@ -10,7 +10,7 @@ __all__ = [
     'MessageFactory',
     'ClientResponsePayload',
     'Status',
-    'NodeIDGenerator',
+    'NodeIDTracker',
     'Oracle',
 ]
 
