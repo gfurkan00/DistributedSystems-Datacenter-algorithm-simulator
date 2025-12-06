@@ -8,7 +8,6 @@ class MessageType(Enum):
     CLIENT_REQUEST = "client_request"
     CLIENT_RESPONSE = "client_response"
     CLIENT_LOOP = "client_loop"
-    CLIENT_TIMEOUT = "client_timeout"
 
     #Primary Backup protocol
     REPLICATION = "replication"

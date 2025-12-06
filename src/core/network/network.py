@@ -25,6 +25,21 @@ class Network(NetworkAPI):
     def register_node(self, node_id: int, receiver_callback: Callable[[Message], None]):
         self._nodes[node_id] = receiver_callback
 
+    def remove_node(self, node_id: int):
+        if node_id not in self._nodes:
+            raise KeyError(f"Node {node_id} does not exist")
+
+        del self._nodes[node_id]
+        self._logger.log(
+            timestamp=self._scheduler.now(),
+            source_node_id=node_id,
+            event_type=EventType.DIE,
+            dest_node_id=None,
+            request_id=None,
+            message_type=None,
+            payload=None,
+        )
+
     def send(self, message: Message):
         if random.random() < self._packet_loss_probability:
             self._logger.log(

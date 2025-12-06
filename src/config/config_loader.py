@@ -38,7 +38,7 @@ class ConfigLoader:
                 type=workload_data.get("type", "sequential"),
                 start_id=workload_data.get("start_id"),
                 clients=workload_data.get("clients", 1),
-                num_requests_per_client=workload_data.get("num_requests_per_client", 1)
+                settings=workload_data.get("settings"),
             )
 
             sim_data = data["simulation"]

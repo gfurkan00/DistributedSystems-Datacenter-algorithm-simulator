@@ -1,6 +1,6 @@
 import csv
 
-from typing import List, Any
+from typing import List, Any, Optional
 
 from .logger_interface import LoggerAPI
 from .utils import LoggerEvent, EventType
@@ -11,7 +11,7 @@ class Logger(LoggerAPI):
     def __init__(self):
         self._logs: List[LoggerEvent] = []
 
-    def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: int, request_id: str, message_type: MessageType, payload: Any):
+    def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: Optional[int], request_id: Optional[str], message_type: Optional[MessageType], payload: Optional[Any]):
         if message_type == MessageType.LOOP_TICK or message_type == MessageType.TIMEOUT_CHECK or message_type == MessageType.CLIENT_LOOP:
             return
 

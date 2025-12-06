@@ -25,4 +25,6 @@ workload:
   type: "sequential"
   start_id: 100
   clients: 1
-  num_requests_per_client: 1
+  settings:
+    num_requests_per_client: 2
+    loop_client_period: 1

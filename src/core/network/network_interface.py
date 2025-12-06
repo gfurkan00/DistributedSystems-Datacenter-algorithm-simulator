@@ -14,6 +14,10 @@ class NetworkAPI(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def remove_node(self, node_id: int) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     def send(self, message: Message) -> None:
         raise NotImplementedError
 

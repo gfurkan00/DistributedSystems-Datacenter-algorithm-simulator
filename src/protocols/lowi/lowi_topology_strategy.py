@@ -1,13 +1,14 @@
 from typing import List
 from src.core.node.node import Node
 from src.core.network.network import NetworkAPI
-from src.config.protocol_config import ProtocolConfig
+from src.config import SimulationConfig
 from src.core.utils import NodeIDTracker
 from src.protocols.lowi import LowiNode
 from src.protocols.topology_factory.topology_strategy import TopologyStrategy
 
 class LowiTopologyStrategy(TopologyStrategy):
-    def build(self, network: NetworkAPI, config: ProtocolConfig) -> List[Node]:
+    def build(self, network: NetworkAPI, config: SimulationConfig) -> List[Node]:
+        config = config.protocol_config
         nodes: List[Node] = []
         all_nodes_ids: List[int] = []
 

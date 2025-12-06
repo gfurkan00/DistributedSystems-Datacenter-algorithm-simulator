@@ -8,7 +8,7 @@ from typing import Optional
 
 @dataclass
 class SimulationConfig:
-    seed: int
+    seed: Optional[int]
     duration: int
     output_file: Optional[str]
     network_config: NetworkConfig
