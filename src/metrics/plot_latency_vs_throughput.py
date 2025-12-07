@@ -67,18 +67,20 @@ def plot_comparison(protocols_data: dict, output_path: str = 'output/latency_vs_
     print(f"{'='*60}\n")
     
     # Opzionale: mostra il grafico
-    # plt.show()
+    plt.show()
 
 
 if __name__ == '__main__':
     protocols_data = {
         'Primary-Backup': [
             '../../output/example_primary_backup_furkan.csv',
+
         ],
         
         'LOWI': [
             '../../output/example_lowi_furkan.csv',
         ],
+
     }
     
     # Genera il grafico

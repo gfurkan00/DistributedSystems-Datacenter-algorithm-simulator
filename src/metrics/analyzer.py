@@ -66,7 +66,7 @@ def analyze_csv(csv_path: str) -> Tuple[float, float]:
     completed['latency'] = completed['receive_time'] - completed['send_time']
     
     print("\n--- DEBUG: Con latenze calcolate ---")
-    print(completed[['request_id', 'send_time', 'receive_time', 'latency']].head(10))
+    print(completed[['request_id', 'send_time', 'receive_time', 'latency']])
     
     # Calcola throughput
     t_first = completed['send_time'].min()
@@ -94,6 +94,6 @@ def analyze_csv(csv_path: str) -> Tuple[float, float]:
 
 if __name__ == '__main__':
 
-    tput_pb, lat_pb = analyze_csv('output/example_low_.csv')
+    tput_pb, lat_pb = analyze_csv('output/example_primary_backup_furkan.csv')
     print(f"   Latenza media:  {lat_pb:.2f} ms")
     print(f"   Throughput:     {tput_pb:.2f} req/s")
