@@ -24,6 +24,9 @@ class ClientNode(Node):
         self._schedule_next_loop_tick()
 
     def receive(self, message: Message):
+        if not self.is_alive:
+            return
+
         if message.msg_type == MessageType.INTERNAL_LOOP:
             self._handle_client_loop()
 
