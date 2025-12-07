@@ -20,8 +20,8 @@ class Statistics:
         for event in self.events:
             # Start: When Client sends CLIENT_REQUEST
             if event.event_type == EventType.SEND and event.message_type == MessageType.CLIENT_REQUEST:
-                if 'start' not in req_times[event.request_id]:
-                    req_times[event.request_id]['start'] = event.timestamp
+                if 'start' not in req_times[event.message_id]:
+                    req_times[event.message_id]['start'] = event.timestamp
             
             # End: When Client receives CLIENT_RESPONSE
             elif event.event_type == EventType.RECEIVE and event.message_type == MessageType.CLIENT_RESPONSE:

@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 from src.core.network import NetworkAPI
 from src.core.node import Node
-from src.core.utils import MessageType, Message, ClientResponsePayload, Status, Oracle
+from src.core.utils import MessageType, Message, ClientResponsePayload, Status, Oracle, ClientRequestPayload
 from src.protocols.lowi.utils import LowiState, LowiPayload
 
 
@@ -38,6 +38,9 @@ class LowiNode(Node):
         return self._node_id == self._state.current_leader_id
 
     def receive(self, msg: Message):
+        if not self.is_alive:
+            return
+
         current_time = self._network.now()
 
         if msg.msg_type == MessageType.CLIENT_REQUEST:
@@ -46,18 +49,18 @@ class LowiNode(Node):
         elif msg.msg_type == MessageType.PROPOSE:
             self._handle_proposal(msg, current_time)
 
-        elif msg.msg_type == MessageType.LOOP_TICK:
+        elif msg.msg_type == MessageType.INTERNAL_LOOP:
             self._run_leader_loop()
 
         elif msg.msg_type == MessageType.TIMEOUT_CHECK:
             self._check_leader_health(current_time)
 
-
     def _handle_client_request(self, msg: Message):
         if self.is_leader:
-            self._state.append_request(msg)
-            self._pending_client_requests[msg.id] = msg.src_id
-            print(f"Node {self._node_id} save CLIENT REQUEST {msg.id}")
+            client_payload: ClientRequestPayload = msg.payload
+            self._pending_client_requests[client_payload.request_id] = msg.src_id
+            self._state.append_request(client_payload)
+            print(f"Node {self._node_id} save CLIENT REQUEST {client_payload.request_id}")
 
     def _run_leader_loop(self):
         if not self.is_leader:
@@ -81,8 +84,8 @@ class LowiNode(Node):
         if request:
             return LowiPayload(
                 cins=self._state.cins,
-                request_id=request.id,
-                data=request.payload,
+                request_id=request.request_id,
+                data=request.data,
                 is_heartbeat=False
             )
         else:
@@ -154,7 +157,7 @@ class LowiNode(Node):
     def _schedule_next_loop_tick(self):
         if not self.is_leader:
             return
-        self.send_sync(dst_id=self._node_id, msg_type=MessageType.LOOP_TICK, payload=None, sync_latency=self._loop_leader_period, violation_probability=0.0)
+        self.send_sync(dst_id=self._node_id, msg_type=MessageType.INTERNAL_LOOP, payload=None, sync_latency=self._loop_leader_period, violation_probability=0.0)
 
     def _schedule_next_timeout_check(self):
         self.send_sync(dst_id=self._node_id, msg_type=MessageType.TIMEOUT_CHECK, payload=None, sync_latency=self._timeout_follower_period, violation_probability=0.0)

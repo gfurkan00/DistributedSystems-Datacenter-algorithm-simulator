@@ -1,11 +1,12 @@
 simulation:
-  seed: 42
-  output_file: "output/example_primary_backup.csv"
+  #seed: 42
+  output_file: "output/example_primary_backup_furkan_crash.csv"
+  duration: 100
 
 network:
-  latency_min: 0.5
-  latency_max: 2.0
-  packet_loss_probability: 0.0
+  latency_min: 0.2
+  latency_max: 2.5
+  packet_loss_probability: 0.01
 
 protocol:
   name: "primary_backup"
@@ -14,12 +15,23 @@ protocol:
   deployment:
     groups:
       - role: "PrimaryNode"
+        start_id: 0
         count: 1
 
       - role: "BackupNode"
-        count: 5
+        start_id: 1
+        count: 9
 
 workload:
   type: "sequential"
-  clients: 5
-  num_requests_per_client: 5
+  start_id: 100
+  clients: 2
+  settings:
+    num_requests_per_client: 2
+    loop_client_period: 2
+    request_timeout_period: 5
+
+failures:
+  - time: 4.0
+    action: "crash"
+    target: [0]
