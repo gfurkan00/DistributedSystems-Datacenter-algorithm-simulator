@@ -9,10 +9,18 @@ class Node(ABC):
     def __init__(self, node_id: int, network: NetworkAPI):
         self._node_id: int = node_id
         self._network: NetworkAPI = network
+        self._is_crashed = False
 
     @property
     def node_id(self) -> int:
         return self._node_id
+
+    @property
+    def is_alive(self):
+        return not self._is_crashed
+
+    def crash(self):
+        self._is_crashed = True
 
     def send(self, dst_id: int, msg_type: MessageType, payload: Any):
         message = MessageFactory.build_message(src_id=self._node_id, dst_id=dst_id, msg_type=msg_type, payload=payload)

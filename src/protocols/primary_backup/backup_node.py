@@ -9,6 +9,9 @@ class BackupNode(Node):
         super().__init__(node_id, network)
 
     def receive(self, message: Message):
+        if not self.is_alive:
+            return
+
         if message.msg_type == MessageType.REPLICATION:
             self._handle_replication_request(message=message)
 

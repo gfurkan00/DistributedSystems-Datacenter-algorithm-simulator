@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from src.config import SimulationConfig
-from src.core.network import NetworkAPI
 from src.core.node import Node
 
 
@@ -17,4 +16,8 @@ class TopologyServiceAPI(ABC):
 
     @abstractmethod
     def register_topology_into_network(self) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def node_crash(self, node_id: int) -> None:
         raise NotImplementedError()

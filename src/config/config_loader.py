@@ -1,5 +1,8 @@
+from typing import List
+
 import yaml
 
+from .failure_config import FailureEventConfig
 from .protocol_config import ProtocolConfig, NodeGroupConfig
 from .simulation_config import SimulationConfig
 from .network_config import NetworkConfig
@@ -41,6 +44,15 @@ class ConfigLoader:
                 settings=workload_data.get("settings"),
             )
 
+            failures_events: List[FailureEventConfig] = []
+            failures_data = data.get("failures") or []
+            for failure in failures_data:
+                failures_events.append(FailureEventConfig(
+                    time=float(failure["time"]),
+                    action=failure["action"],
+                    target=failure["target"],
+                ))
+
             sim_data = data["simulation"]
             return SimulationConfig(
                 seed=sim_data.get("seed"),
@@ -49,4 +61,5 @@ class ConfigLoader:
                 network_config=network_config,
                 protocol_config=protocol_config,
                 workload_config=workload_config,
+                failures=failures_events,
             )

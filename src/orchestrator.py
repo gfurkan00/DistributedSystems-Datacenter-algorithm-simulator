@@ -10,8 +10,8 @@ from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
 from src.config import ConfigLoader
 from src.core.statistics import Statistics
-from src.service.topology_service import TopologyService
-from src.service.topology_service_interface import TopologyServiceAPI
+from src.service.failure import FailureServiceAPI, FailureService
+from src.service.topology import TopologyServiceAPI, TopologyService
 
 
 def _register_nodes_factories():
@@ -28,7 +28,7 @@ def core(configuration_file: str) -> None:
         random.seed(config.seed)
     
     logger: LoggerAPI = Logger()
-    scheduler: SchedulerAPI = Scheduler(logger=logger)
+    scheduler: SchedulerAPI = Scheduler()
     
     network: NetworkAPI = Network(
         scheduler=scheduler, 
@@ -42,6 +42,9 @@ def core(configuration_file: str) -> None:
     topology_service.build_topology(config=config)
     topology_service.register_topology_into_network()
     print(f"Created topology of {len(topology_service.get_topology())} nodes")
+
+    failure_service: FailureServiceAPI = FailureService(scheduler=scheduler, topology_service=topology_service)
+    failure_service.schedule_failures(failure_configs=config.failures)
 
     scheduler.run(duration=config.duration)
 

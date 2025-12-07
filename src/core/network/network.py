@@ -53,8 +53,18 @@ class Network(NetworkAPI):
             )
             return
 
+        self._logger.log(
+            timestamp=self._scheduler.now(),
+            source_node_id=message.src_id,
+            event_type=EventType.SEND,
+            dest_node_id=message.dst_id,
+            message_id=message.id,
+            message_type=message.msg_type,
+            payload=message.payload,
+        )
+
         latency = self._get_latency()
-        self._scheduler.schedule_event(delay=latency, callback=lambda msg: self._on_receive(message=msg), message=message)
+        self._scheduler.schedule_event(delay=latency, callback=lambda: self._on_receive(message))
 
     def send_sync(self, message: Message, sync_latency: float, violation_probability: float):
         if random.random() < violation_probability:
@@ -69,7 +79,16 @@ class Network(NetworkAPI):
             )
             return
 
-        self._scheduler.schedule_event(delay=sync_latency, callback=lambda msg: self._on_receive(message=msg), message=message)
+        self._logger.log(
+            timestamp=self._scheduler.now(),
+            source_node_id=message.src_id,
+            event_type=EventType.SEND,
+            dest_node_id=message.dst_id,
+            message_id=message.id,
+            message_type=message.msg_type,
+            payload=message.payload,
+        )
+        self._scheduler.schedule_event(delay=sync_latency, callback=lambda: self._on_receive(message))
 
     def _on_receive(self, message: Message):
         callback = self._nodes.get(message.dst_id)

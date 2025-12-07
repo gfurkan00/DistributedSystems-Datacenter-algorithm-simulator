@@ -10,7 +10,7 @@ class SchedulerAPI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def schedule_event(self, delay: float, callback: Callable[[Message], None], message: Message) -> None:
+    def schedule_event(self, delay: float, callback: Callable[[], None]) -> None:
         raise NotImplementedError
 
     @abstractmethod

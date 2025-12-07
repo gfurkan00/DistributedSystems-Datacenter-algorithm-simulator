@@ -48,8 +48,7 @@ class ClientRequestPayload:
 class Event:
     delivery_time: float
     seq: int
-    callback: Callable[[Message], None]
-    message: Message
+    callback: Callable[[], None]
 
     def __lt__(self, other):
         return self.delivery_time < other.delivery_time

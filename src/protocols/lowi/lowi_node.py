@@ -38,6 +38,9 @@ class LowiNode(Node):
         return self._node_id == self._state.current_leader_id
 
     def receive(self, msg: Message):
+        if not self.is_alive:
+            return
+
         current_time = self._network.now()
 
         if msg.msg_type == MessageType.CLIENT_REQUEST:

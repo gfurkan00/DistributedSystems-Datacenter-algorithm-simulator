@@ -23,6 +23,9 @@ class PrimaryNode(Node):
         Oracle.set_leader_id(self._node_id)
 
     def receive(self, message: Message):
+        if not self.is_alive:
+            return
+
         if message.msg_type == MessageType.CLIENT_REQUEST:
             self._handle_client_request(msg=message)
 
