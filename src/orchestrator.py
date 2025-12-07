@@ -11,6 +11,7 @@ from src.core.network.network import Network, NetworkAPI
 from src.config import ConfigLoader
 from src.core.statistics import Statistics
 from src.service.topology_service import TopologyService
+from src.service.topology_service_interface import TopologyServiceAPI
 
 
 def _register_nodes_factories():
@@ -37,7 +38,7 @@ def core(configuration_file: str) -> None:
         packet_loss_probability=config.network_config.packet_loss_probability
     )
 
-    topology_service: TopologyService = TopologyService(network=network)
+    topology_service: TopologyServiceAPI = TopologyService(network=network)
     topology_service.build_topology(config=config)
     topology_service.register_topology_into_network()
     print(f"Created topology of {len(topology_service.get_topology())} nodes")

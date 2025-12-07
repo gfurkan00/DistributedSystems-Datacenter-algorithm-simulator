@@ -35,7 +35,7 @@ class Network(NetworkAPI):
             source_node_id=node_id,
             event_type=EventType.DIE,
             dest_node_id=None,
-            request_id=None,
+            message_id=None,
             message_type=None,
             payload=None,
         )
@@ -47,7 +47,7 @@ class Network(NetworkAPI):
                 source_node_id=message.src_id,
                 event_type=EventType.DROP,
                 dest_node_id=message.dst_id,
-                request_id=message.id,
+                message_id=message.id,
                 message_type=message.msg_type,
                 payload=message.payload,
             )
@@ -63,7 +63,7 @@ class Network(NetworkAPI):
                 source_node_id=message.src_id,
                 event_type=EventType.DROP,
                 dest_node_id=message.dst_id,
-                request_id=message.id,
+                message_id=message.id,
                 message_type=message.msg_type,
                 payload=message.payload,
             )
@@ -81,7 +81,7 @@ class Network(NetworkAPI):
             source_node_id=message.src_id,
             event_type=EventType.RECEIVE,
             dest_node_id=message.dst_id,
-            request_id=message.id,
+            message_id=message.id,
             message_type=message.msg_type,
             payload=message.payload,
         )

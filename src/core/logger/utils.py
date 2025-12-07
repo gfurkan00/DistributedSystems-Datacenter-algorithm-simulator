@@ -18,7 +18,7 @@ class LoggerEvent:
     source_node_id: int
     event_type: EventType
     dest_node_id: Optional[int]
-    request_id: Optional[str]
+    message_id: Optional[str]
     message_type: Optional[MessageType]
     payload: Optional[Any]
 
@@ -36,4 +36,4 @@ class LoggerEvent:
     def to_str(self) -> str:
         event_type = self.event_type.name
         msg_type = self.message_type.name if self.message_type is not None else ''
-        return f"[{self.timestamp:.4f}] Node {self.source_node_id} -> Node {self.dest_node_id} | {event_type.upper()} | {msg_type.upper()} | Req: {self.request_id} | Payload: {self.payload}"
+        return f"[{self.timestamp:.4f}] Node {self.source_node_id} -> Node {self.dest_node_id} | {event_type.upper()} | {msg_type.upper()} | Message ID: {self.message_id} | Payload: {self.payload}"

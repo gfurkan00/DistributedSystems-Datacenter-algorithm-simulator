@@ -6,7 +6,7 @@ from ..utils import MessageType
 
 
 class LoggerAPI(ABC):
-    def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: Optional[int], request_id: Optional[str], message_type: Optional[MessageType], payload: Optional[Any]) -> None:
+    def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: Optional[int], message_id: Optional[str], message_type: Optional[MessageType], payload: Optional[Any]) -> None:
         raise NotImplementedError
 
     def get_logs(self) -> List[LoggerEvent]:

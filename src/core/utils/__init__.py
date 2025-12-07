@@ -1,7 +1,8 @@
-from .utils import Message, MessageType, Event, ClientResponsePayload, Status
+from .utils import Message, MessageType, Event, ClientResponsePayload, ClientRequestPayload, Status
 from .message_factory import MessageFactory
 from .node_id_tracker import NodeIDTracker
 from .oracle import Oracle
+from .uuid import new_uuid
 
 __all__ = [
     'Message',
@@ -9,9 +10,11 @@ __all__ = [
     'Event',
     'MessageFactory',
     'ClientResponsePayload',
+    'ClientRequestPayload',
     'Status',
     'NodeIDTracker',
     'Oracle',
+    'new_uuid'
 ]
 
 __version__ = '1.0.0'

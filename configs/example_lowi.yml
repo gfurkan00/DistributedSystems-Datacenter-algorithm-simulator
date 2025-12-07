@@ -1,7 +1,7 @@
 simulation:
   seed: 42
-  output_file: "output/example_lowi.csv"
-  duration: 500
+  output_file: "output/example_lowi_furkan.csv"
+  duration: 1000
 
 network:
   latency_min: 0.5
@@ -20,16 +20,13 @@ protocol:
     groups:
       - role: "LowiNode"
         start_id: 0
-        count: 3
-
-      - role: "LowiNode"
-        start_id: 10
         count: 10
 
 workload:
   type: "sequential"
   start_id: 100
-  clients: 1
+  clients: 5
   settings:
-    num_requests_per_client: 2
-    loop_client_period: 1
+    num_requests_per_client: 5
+    loop_client_period: 2
+    request_timeout_period: 5

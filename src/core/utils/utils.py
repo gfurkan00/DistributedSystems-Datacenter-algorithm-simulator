@@ -7,16 +7,17 @@ class MessageType(Enum):
     #Client
     CLIENT_REQUEST = "client_request"
     CLIENT_RESPONSE = "client_response"
-    CLIENT_LOOP = "client_loop"
 
     #Primary Backup protocol
     REPLICATION = "replication"
     ACK = "ack"
 
     #Lowi
-    LOOP_TICK = "loop_tick"
-    TIMEOUT_CHECK = "timeout_check"
     PROPOSE = "propose"
+
+    #General
+    INTERNAL_LOOP = "internal_loop"
+    TIMEOUT_CHECK = "timeout_check"
 
 
 @dataclass
@@ -38,6 +39,10 @@ class ClientResponsePayload:
     request_id: str
     status: Status
 
+@dataclass
+class ClientRequestPayload:
+    request_id: str
+    data: Any
 
 @dataclass
 class Event:

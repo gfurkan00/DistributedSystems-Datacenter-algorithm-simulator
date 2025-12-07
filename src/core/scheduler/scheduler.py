@@ -29,7 +29,7 @@ class Scheduler(SchedulerAPI):
             source_node_id=message.src_id,
             event_type=EventType.SEND,
             dest_node_id=message.dst_id,
-            request_id=message.id,
+            message_id=message.id,
             message_type=message.msg_type,
             payload=message.payload,
         )

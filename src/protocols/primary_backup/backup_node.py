@@ -8,12 +8,15 @@ class BackupNode(Node):
     def __init__(self, node_id: int, network: NetworkAPI):
         super().__init__(node_id, network)
 
-    def receive(self, msg: Message):
-        if msg.msg_type == MessageType.REPLICATION:
-            replication_payload: ReplicationPayload = msg.payload
-            request_id = replication_payload.request_id
-            data = replication_payload.payload
+    def receive(self, message: Message):
+        if message.msg_type == MessageType.REPLICATION:
+            self._handle_replication_request(message=message)
 
-            print(f"Backup node {self._node_id} get replication request from primary node {msg.src_id} for the payload {data}")
+    def _handle_replication_request(self, message: Message):
+        replication_payload: ReplicationPayload = message.payload
+        request_id = replication_payload.request_id
+        data = replication_payload.payload
 
-            self.send(msg.src_id, MessageType.ACK, request_id)
+        print(f"Backup node {self._node_id} get replication request from primary node {message.src_id} for the payload {data}")
+
+        self.send(message.src_id, MessageType.ACK, request_id)
