@@ -4,6 +4,7 @@ import random
 import src.core.node.client as client
 import src.protocols.primary_backup as primary_backup
 import src.protocols.lowi as lowi
+import src.protocols.basic_paxos as basic_paxos
 
 from src.core.logger.logger import Logger, LoggerAPI
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
@@ -18,6 +19,7 @@ def _register_nodes_factories():
     client.register()
     primary_backup.register()
     lowi.register()
+    basic_paxos.register()
 
 def core(configuration_file: str) -> None:
     _register_nodes_factories()

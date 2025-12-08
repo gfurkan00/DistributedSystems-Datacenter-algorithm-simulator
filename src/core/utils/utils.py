@@ -15,6 +15,12 @@ class MessageType(Enum):
     #Lowi
     PROPOSE = "propose"
 
+    #Paxos
+    PREPARE = "prepare"
+    PROMISE = "promise"
+    ACCEPT = "accept"
+    ACCEPTED = "accepted"
+
     #General
     INTERNAL_LOOP = "internal_loop"
     TIMEOUT_CHECK = "timeout_check"

@@ -3,6 +3,7 @@ from typing import List, Optional
 from src.config import SimulationConfig
 from src.core.network import NetworkAPI
 from src.core.node import Node
+from src.core.utils import Oracle
 from src.protocols.topology_factory import TopologyBuilderFactory
 from src.service.topology.topology_service_interface import TopologyServiceAPI
 
@@ -37,6 +38,9 @@ class TopologyService(TopologyServiceAPI):
             return
         node.crash()
         self._network.remove_node(node_id=node.node_id)
+
+        if Oracle.is_leader(leader_id=node.node_id):
+            Oracle.remove_leader(leader_id=node.node_id)
 
     def _get_node_by_id(self, node_id: int) -> Optional[Node]:
         for node in self._topology:

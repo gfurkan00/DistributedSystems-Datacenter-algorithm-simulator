@@ -1,59 +1,35 @@
-# Paxos Configuration Example
-# Single proposer, 5 acceptors (quorum = 3)
-
 simulation:
-  seed: 123
-  output_file: "output/paxos_5_acceptors.csv"
+  #seed: 1234
+  output_file: "output/example_paxos.csv"
+  duration: 1000
 
 network:
   latency_min: 0.5
   latency_max: 2.0
-  packet_loss_prob: 0.0
+  packet_loss_probability: 0.01
 
-# Node Configuration
-nodes:
-  # Client node
-  - id: 99
-    type: "ClientNode"
-  
-  # Proposer (also acts as learner)
-  - id: 0
-    type: "ProposerNode"
-    protocol: "paxos"
-    config:
-      acceptor_ids: [1, 2, 3, 4, 5]
-      quorum_size: 3          # Need 3/5 for consensus
-  
-  # Acceptor nodes
-  - id: 1
-    type: "AcceptorNode"
-    protocol: "paxos"
-  
-  - id: 2
-    type: "AcceptorNode"
-    protocol: "paxos"
-  
-  - id: 3
-    type: "AcceptorNode"
-    protocol: "paxos"
-  
-  - id: 4
-    type: "AcceptorNode"
-    protocol: "paxos"
-  
-  - id: 5
-    type: "AcceptorNode"
-    protocol: "paxos"
+protocol:
+  name: "basic_paxos"
+  deployment:
+    groups:
+      - role: "ProposerNode"
+        start_id: 0
+        count: 2
 
-# Workload Configuration
+      - role: "AcceptorNode"
+        start_id: 2
+        count: 5
+
 workload:
   type: "sequential"
-  client_id: 99
-  target_id: 0                # Send to proposer
-  requests:
-    - payload: "Value_1"
-      delay: 0.0
-    - payload: "Value_2"
-      delay: 0.0
-    - payload: "Value_3"
-      delay: 0.0
+  start_id: 100
+  clients: 2
+  settings:
+    num_requests_per_client: 2
+    loop_client_period: 2
+    request_timeout_period: 5
+
+failures:
+  - time: 3.0
+    action: "crash"
+    target: 5

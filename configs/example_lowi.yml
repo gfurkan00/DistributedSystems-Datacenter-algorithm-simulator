@@ -32,6 +32,6 @@ workload:
     request_timeout_period: 5
 
 failures:
-  - time: 5.0
+  - time: 3.0
     action: "crash"
     target: 0
