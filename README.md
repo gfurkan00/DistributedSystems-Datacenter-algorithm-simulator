@@ -42,7 +42,7 @@ The project is organized to separate the simulation core from specific protocol 
 
 ```text
 src/
-├── config/       # Handles parsing of YAML configuration files
+├── config/       # Handles parsing of YAML configuration file
 ├── core/         # The heart of the simulator
 │   ├── network/  # Message passing interface and simulated network layer
 │   ├── node/     # Abstract base classes for nodes and clients
@@ -130,5 +130,6 @@ The simulator is fully data-driven. A single YAML file dictates the topology, th
 ## 👨‍💻 Authors
 
 - **Luca Fantò** - Research Assistant in Distributed Systems and Cloud (ISIN - Institute of Information Systems and Networking)
-
 - **Furkan Gumus** - Cloud Engineer
+- **Rai Muneeb Ullah Khan**
+- **Petar Eric**
