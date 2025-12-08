@@ -2,8 +2,9 @@ from typing import Dict, Any
 
 from src.core.network import NetworkAPI
 from src.core.node import Node
-from src.core.utils import MessageType, Message, ClientResponsePayload, Status, Oracle, ClientRequestPayload
+from src.core.utils import MessageType, Message, ClientResponsePayload, Status, ClientRequestPayload
 from src.protocols.lowi.utils import LowiState, LowiPayload
+from src.core.oracles import OracleLeader
 
 
 class LowiNode(Node):
@@ -30,7 +31,7 @@ class LowiNode(Node):
 
         self._schedule_next_timeout_check()
         if self.is_leader:
-            Oracle.set_leader_id(self._node_id)
+            OracleLeader.set_leader_id(self._node_id)
             self._schedule_next_loop_tick()
 
     @property
@@ -56,11 +57,21 @@ class LowiNode(Node):
             self._check_leader_health(current_time)
 
     def _handle_client_request(self, msg: Message):
-        if self.is_leader:
-            client_payload: ClientRequestPayload = msg.payload
-            self._pending_client_requests[client_payload.request_id] = msg.src_id
-            self._state.append_request(client_payload)
-            print(f"Node {self._node_id} save CLIENT REQUEST {client_payload.request_id}")
+        client_payload: ClientRequestPayload = msg.payload
+
+        data_already_processed = self._state.get_decision(request_id=client_payload.request_id)
+        if data_already_processed:
+            self._send_client_response(client_payload.request_id, Status.SUCCESS)
+            return
+
+        if not self.is_leader:
+            return
+
+        if client_payload.request_id in self._pending_client_requests:
+            return
+
+        self._pending_client_requests[client_payload.request_id] = msg.src_id
+        self._state.append_request(client_payload)
 
     def _run_leader_loop(self):
         if not self.is_leader:
@@ -72,7 +83,7 @@ class LowiNode(Node):
             self._broadcast_proposal(payload)
 
             if not payload.is_heartbeat:
-                self._state.append_decision(payload.data)
+                self._state.append_decision(request_id=payload.request_id, data=payload.data)
                 self._send_client_response(payload.request_id, Status.SUCCESS)
             else:
                 self._state.cins = self._state.lins
@@ -99,11 +110,14 @@ class LowiNode(Node):
     def _broadcast_proposal(self, payload: LowiPayload):
         for dst_id in self._all_nodes:
             if dst_id != self._node_id:
-                print(f"Node {self._node_id} send PROPOSE {payload.data} to {dst_id}. Is heartbeat? {payload.is_heartbeat}")
+                #print(f"Node {self._node_id} send PROPOSE {payload.data} to {dst_id}. Is heartbeat? {payload.is_heartbeat}")
                 self.send_sync(dst_id=dst_id, msg_type=MessageType.PROPOSE, payload=payload, sync_latency=self._sync_latency, violation_probability=self._violation_synchronous_probability)
 
 
     def _send_client_response(self, request_id: str, status: Status):
+        if request_id not in self._pending_client_requests:
+            return
+
         client_id = self._pending_client_requests[request_id]
         client_response_payload: ClientResponsePayload = ClientResponsePayload(request_id=request_id, status=status)
         self.send(dst_id=client_id, msg_type=MessageType.CLIENT_RESPONSE, payload=client_response_payload)
@@ -113,7 +127,7 @@ class LowiNode(Node):
         sender = msg.src_id
         payload: LowiPayload = msg.payload
 
-        print(f"Node {self._node_id} receive PROPOSE from {msg.src_id}. Is heartbeat? {payload.is_heartbeat}")
+        #print(f"Node {self._node_id} receive PROPOSE from {msg.src_id}. Is heartbeat? {payload.is_heartbeat}")
 
         if sender > self._state.current_leader_id:
             self._switch_leader(sender, now)
@@ -124,16 +138,16 @@ class LowiNode(Node):
             if payload.is_heartbeat:
                 self._state.cins = self._state.lins
             else:
-                self._state.append_decision(payload.data)
+                self._state.append_decision(request_id=payload.request_id, data=payload.data)
                 self._state.cins = payload.cins
                 self._state.lins = payload.cins
-                print(f"Node {self._node_id} COMMITTED: {payload.data}")
+                #print(f"Node {self._node_id} COMMITTED: {payload.data}")
 
 
     def _check_leader_health(self, now: float):
         if not self.is_leader:
             if now - self._last_leader_contact_follower_time > self._timeout_limit:
-                print(f"Node {self._node_id} notice Leader TIMEOUT: Leader {self._state.current_leader_id} is dead")
+                #print(f"Node {self._node_id} notice Leader TIMEOUT: Leader {self._state.current_leader_id} is dead")
                 self._perform_deterministic_election(now)
 
         self._schedule_next_timeout_check()
@@ -147,7 +161,7 @@ class LowiNode(Node):
 
         if self.is_leader:
             print(f"Node {self._node_id} became leader")
-            Oracle.set_leader_id(self._node_id)
+            OracleLeader.set_leader_id(self._node_id)
             self._schedule_next_loop_tick()
 
     def _switch_leader(self, new_leader_id: int, now: float):

@@ -2,7 +2,7 @@ import random
 from typing import List, Optional
 
 
-class Oracle:
+class OracleLeader:
     _LEADERS: List[int] = []
 
     @classmethod

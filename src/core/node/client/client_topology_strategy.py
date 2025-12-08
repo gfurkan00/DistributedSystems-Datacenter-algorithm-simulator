@@ -4,6 +4,7 @@ from src.config import SimulationConfig
 from src.core.network import NetworkAPI
 from src.core.node import Node
 from src.core.node.client import ClientNode
+from src.core.oracles import OracleRequest
 from src.core.utils import NodeIDTracker
 from src.protocols.topology_factory import TopologyStrategy
 
@@ -27,5 +28,7 @@ class ClientTopologyStrategy(TopologyStrategy):
         for client_id in client_ids:
             client = ClientNode(node_id=client_id, network=network, settings=config.settings)
             client_nodes.append(client)
+
+        OracleRequest.set_total_requests(config.clients * config.settings.get("num_requests_per_client", 0))
 
         return client_nodes

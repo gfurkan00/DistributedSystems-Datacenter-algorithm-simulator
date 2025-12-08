@@ -1,7 +1,7 @@
 simulation:
   #seed: 1234
   output_file: "output/example_paxos.csv"
-  duration: 1000
+  duration: 10000
 
 network:
   latency_min: 0.5
@@ -27,9 +27,9 @@ workload:
   settings:
     num_requests_per_client: 2
     loop_client_period: 2
-    request_timeout_period: 5
+    request_timeout_period: 10
 
 failures:
-  - time: 3.0
+  - time: 4.0
     action: "crash"
-    target: 5
+    target: 1

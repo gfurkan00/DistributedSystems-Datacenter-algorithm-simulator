@@ -3,7 +3,8 @@ from typing import List, Dict, Any
 from .utils import PendingProposal, PreparePayload, PromisePayload, AcceptPayload
 from src.core.node.node import Node
 from src.core.network import NetworkAPI
-from src.core.utils import Message, MessageType, ClientRequestPayload, ClientResponsePayload, Status, Oracle
+from src.core.utils import Message, MessageType, ClientRequestPayload, ClientResponsePayload, Status
+from src.core.oracles import OracleLeader
 
 
 class ProposerNode(Node):
@@ -18,7 +19,7 @@ class ProposerNode(Node):
         self._proposal_step: int = len(self._acceptor_ids) + 1
         self._majority = (len(self._acceptor_ids) // 2) + 1
 
-        Oracle.register_leader(self._node_id)
+        OracleLeader.register_leader(self._node_id)
 
     def receive(self, msg: Message):
         if not self.is_alive:

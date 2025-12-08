@@ -20,6 +20,6 @@ class BackupNode(Node):
         request_id = replication_payload.request_id
         data = replication_payload.payload
 
-        print(f"Backup node {self._node_id} get replication request from primary node {message.src_id} for the payload {data}")
+        #print(f"Backup node {self._node_id} get replication request from primary node {message.src_id} for the payload {data}")
 
         self.send(message.src_id, MessageType.ACK, request_id)

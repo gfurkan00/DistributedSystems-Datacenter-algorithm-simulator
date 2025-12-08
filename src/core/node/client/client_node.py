@@ -3,8 +3,9 @@ from typing import Dict, Any
 from src.core.network import NetworkAPI
 from src.core.node import Node
 from .utils import PendingRequestState
-from src.core.utils import Message, MessageType, ClientResponsePayload, MessageFactory, Oracle, new_uuid, \
-    ClientRequestPayload
+from src.core.utils import Message, MessageType, ClientResponsePayload, MessageFactory, new_uuid, \
+    ClientRequestPayload, Status
+from src.core.oracles import OracleRequest, OracleLeader
 
 
 class ClientNode(Node):
@@ -58,7 +59,7 @@ class ClientNode(Node):
         if not state:
             return
 
-        target_id = Oracle.get_leader_id()
+        target_id = OracleLeader.get_leader_id()
         payload = ClientRequestPayload(
             request_id=state.request_id,
             data=state.payload_data
@@ -90,6 +91,9 @@ class ClientNode(Node):
         if request_id in self._pending_requests:
             print(f"Client {self.node_id}: Response received for {request_id} from Node {message.src_id}, with status {response_payload.status.value}")
             del self._pending_requests[request_id]
+
+            if response_payload.status == Status.SUCCESS:
+                OracleRequest.register_new_success_request()
 
     def _schedule_next_loop_tick(self):
         self.send_sync(dst_id=self._node_id, msg_type=MessageType.INTERNAL_LOOP, payload=None, sync_latency=self._loop_client_period, violation_probability=0.0)

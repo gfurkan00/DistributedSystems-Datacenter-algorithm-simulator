@@ -14,6 +14,9 @@ class AcceptorNode(Node):
         self._accepted_value: Dict[str, Any] = {}
 
     def receive(self, msg: Message):
+        if not self.is_alive:
+            return
+
         if msg.msg_type == MessageType.PREPARE:
             self._handle_prepare(msg)
         elif msg.msg_type == MessageType.ACCEPT:

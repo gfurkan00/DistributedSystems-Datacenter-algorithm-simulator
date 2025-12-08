@@ -1,5 +1,6 @@
 import os
 import random
+import time
 
 import src.core.node.client as client
 import src.protocols.primary_backup as primary_backup
@@ -7,6 +8,7 @@ import src.protocols.lowi as lowi
 import src.protocols.basic_paxos as basic_paxos
 
 from src.core.logger.logger import Logger, LoggerAPI
+from src.core.oracles import OracleRequest, OracleLeader
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
 from src.config import ConfigLoader
@@ -48,7 +50,14 @@ def core(configuration_file: str) -> None:
     failure_service: FailureServiceAPI = FailureService(scheduler=scheduler, topology_service=topology_service)
     failure_service.schedule_failures(failure_configs=config.failures)
 
+    start_time = time.time()
     scheduler.run(duration=config.duration)
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    print(f"Success requests are {OracleRequest.get_success_request()} of total {OracleRequest.get_total_requests()} requests")
+    print(f"Rate success requests / total request {OracleRequest.get_rate_success() * 100}%")
+    print(f"Error requests are {OracleRequest.get_error_request()} of total {OracleRequest.get_total_requests()} requests")
+    print(f"Rate error requests / total request {OracleRequest.get_rate_error_request() * 100}%")
 
     output_path = config.output_file
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -56,5 +65,5 @@ def core(configuration_file: str) -> None:
     logger.dump_to_csv(output_path)
     print(f"Logs saved to {output_path}")
 
-    stats = Statistics(logger.get_logs())
-    stats.print_report()
+    #stats = Statistics(logger.get_logs())
+    #stats.print_report()

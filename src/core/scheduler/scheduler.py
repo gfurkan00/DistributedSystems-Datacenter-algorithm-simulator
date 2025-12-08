@@ -2,10 +2,8 @@ import heapq
 
 from typing import List, Callable
 
-from src.core.logger.logger_interface import LoggerAPI
-from src.core.logger.utils import EventType
 from src.core.scheduler.scheduler_interface import SchedulerAPI
-from src.core.utils import Event, Message
+from src.core.utils import Event
 
 
 class Scheduler(SchedulerAPI):

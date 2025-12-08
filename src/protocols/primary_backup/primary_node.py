@@ -2,8 +2,9 @@ from typing import List, Dict, Any
 
 from src.core.node.node import Node
 from src.core.network import NetworkAPI
-from src.core.utils import Message, MessageType, ClientResponsePayload, Status, Oracle, ClientRequestPayload
+from src.core.utils import Message, MessageType, ClientResponsePayload, Status, ClientRequestPayload
 from src.protocols.primary_backup.utils import PendingRequest, ReplicationPayload
+from src.core.oracles import OracleLeader
 
 
 class PrimaryNode(Node):
@@ -20,7 +21,7 @@ class PrimaryNode(Node):
 
         self._pending_request_dict: Dict[str, PendingRequest] = {}
 
-        Oracle.set_leader_id(self._node_id)
+        OracleLeader.set_leader_id(self._node_id)
 
     def receive(self, message: Message):
         if not self.is_alive:
