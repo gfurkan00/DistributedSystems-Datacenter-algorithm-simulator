@@ -71,17 +71,38 @@ def plot_comparison(protocols_data: dict, output_path: str = 'output/latency_vs_
 
 
 if __name__ == '__main__':
+    # Trova la directory root del progetto (2 livelli sopra questo file)
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    
     protocols_data = {
         'Primary-Backup': [
-            '../../output/example_primary_backup_furkan.csv',
-
+            # Configurazioni base
+            str(project_root / 'output/comparison/pb_low.csv'),
+            str(project_root / 'output/comparison/pb_medium.csv'),
+            str(project_root / 'output/comparison/pb_high.csv'),
+            str(project_root / 'output/comparison/pb_extreme.csv'),
+            # Configurazioni saturazione
+            str(project_root / 'output/comparison/pb_sat_50.csv'),
+            str(project_root / 'output/comparison/pb_sat_100.csv'),
+            str(project_root / 'output/comparison/pb_sat_150.csv'),
+            str(project_root / 'output/comparison/pb_sat_200.csv'),
         ],
         
         'LOWI': [
-            '../../output/example_lowi_furkan.csv',
+            # Configurazioni base
+            str(project_root / 'output/comparison/lowi_low.csv'),
+            str(project_root / 'output/comparison/lowi_medium.csv'),
+            str(project_root / 'output/comparison/lowi_high.csv'),
+            str(project_root / 'output/comparison/lowi_extreme.csv'),
+            # Configurazioni saturazione
+            str(project_root / 'output/comparison/lowi_sat_50.csv'),
+            str(project_root / 'output/comparison/lowi_sat_70.csv'),
+            str(project_root / 'output/comparison/lowi_sat_90.csv'),
+            str(project_root / 'output/comparison/lowi_sat_110.csv'),
         ],
-
     }
     
     # Genera il grafico
-    plot_comparison(protocols_data, output_path='../../output/latency_vs_throughput.png')
+    output_path = str(project_root / 'output/latency_vs_throughput_complete.png')
+    plot_comparison(protocols_data, output_path=output_path)
