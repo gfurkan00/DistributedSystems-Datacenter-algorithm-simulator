@@ -1,0 +1,13 @@
+simulation:
+  seed: 42
+  duration_seconds: 10
+
+network:
+  latency:
+    min: 0.5
+    max: 2.0
+  loss_prob: 0.0
+
+logging:
+  path: output/simulation.csv
+
