@@ -29,7 +29,7 @@ These sections are shared across all protocols.
 Controls the execution environment and reproducibility.
 
 | Parameter     | Type     | Description                                                                                             |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+|---------------|----------|---------------------------------------------------------------------------------------------------------|
 | `duration`    | `int`    | The maximum simulation time (virtual units/ticks)                                                       |
 | `output_file` | `string` | Path where the CSV metrics will be saved                                                                |
 | `seed`        | `int`    | (Optional) If provided, the simulation is deterministic. If omitted or commented out, the run is random |
@@ -41,7 +41,7 @@ Controls the execution environment and reproducibility.
 Models the physical layer constraints.
 
 | Parameter                 | Type    | Description                                         |
-| ------------------------- | ------- | --------------------------------------------------- |
+|---------------------------|---------|-----------------------------------------------------|
 | `latency_min`             | `float` | Minimum transmission delay (virtual units/ticks)    |
 | `latency_max`             | `float` | Maximum transmission delay (virtual units/ticks)    |
 | `packet_loss_probability` | `float` | Probability (0.0 to 1.0) of a message being dropped |
@@ -53,7 +53,7 @@ Models the physical layer constraints.
 Defines the clients interacting with the system.
 
 | Parameter                 | Type     | Description                                                                     |
-| ------------------------- | -------- | ------------------------------------------------------------------------------- |
+|---------------------------|----------|---------------------------------------------------------------------------------|
 | `type`                    | `string` | Workload pattern (e.g. `sequential`)                                            |
 | `clients`                 | `int`    | Number of client nodes to spawn                                                 |
 | `start_id`                | `int`    | (Optional) Starting Integer ID for clients. If omitted, random IDs are assigned |
@@ -68,7 +68,7 @@ Defines the clients interacting with the system.
 A list of scheduled events to test fault tolerance.
 
 | Parameter | Type             | Description                                  |
-| --------- | ---------------- | -------------------------------------------- |
+|-----------|------------------|----------------------------------------------|
 | `time`    | `float`          | The exact simulation time the failure occurs |
 | `action`  | `string`         | The type of failure (e.g. `crash`)           |
 | `target`  | `int` or `[int]` | The ID(s) of the node(s) to fail             |
@@ -265,7 +265,7 @@ protocol:
 ## Node Types
 
 | Type           | Protocol       | Role                      |
-| -------------- | -------------- | ------------------------- |
+|----------------|----------------|---------------------------|
 | `ClientNode`   | Any            | Sends requests            |
 | `PrimaryNode`  | Primary-Backup | Main replica              |
 | `BackupNode`   | Primary-Backup | Backup replica            |

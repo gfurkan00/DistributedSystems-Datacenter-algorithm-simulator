@@ -71,38 +71,40 @@ def plot_comparison(protocols_data: dict, output_path: str = 'output/latency_vs_
 
 
 if __name__ == '__main__':
-    # Trova la directory root del progetto (2 livelli sopra questo file)
-    script_dir = Path(__file__).parent
-    project_root = script_dir.parent.parent
-    
     protocols_data = {
         'Primary-Backup': [
-            # Configurazioni base
-            str(project_root / 'output/comparison/pb_low.csv'),
-            str(project_root / 'output/comparison/pb_medium.csv'),
-            str(project_root / 'output/comparison/pb_high.csv'),
-            str(project_root / 'output/comparison/pb_extreme.csv'),
-            # Configurazioni saturazione
-            str(project_root / 'output/comparison/pb_sat_50.csv'),
-            str(project_root / 'output/comparison/pb_sat_100.csv'),
-            str(project_root / 'output/comparison/pb_sat_150.csv'),
-            str(project_root / 'output/comparison/pb_sat_200.csv'),
+            str('output/comparison/pb_low.csv'),
+            str('output/comparison/pb_medium.csv'),
+            str('output/comparison/pb_high.csv'),
+            str('output/comparison/pb_extreme.csv'),
+            str('output/comparison/pb_sat_50.csv'),
+            str('output/comparison/pb_sat_100.csv'),
+            str('output/comparison/pb_sat_150.csv'),
+            str('output/comparison/pb_sat_200.csv'),
         ],
         
         'LOWI': [
-            # Configurazioni base
-            str(project_root / 'output/comparison/lowi_low.csv'),
-            str(project_root / 'output/comparison/lowi_medium.csv'),
-            str(project_root / 'output/comparison/lowi_high.csv'),
-            str(project_root / 'output/comparison/lowi_extreme.csv'),
-            # Configurazioni saturazione
-            str(project_root / 'output/comparison/lowi_sat_50.csv'),
-            str(project_root / 'output/comparison/lowi_sat_70.csv'),
-            str(project_root / 'output/comparison/lowi_sat_90.csv'),
-            str(project_root / 'output/comparison/lowi_sat_110.csv'),
+            str('output/comparison/lowi_low.csv'),
+            str('output/comparison/lowi_medium.csv'),
+            str('output/comparison/lowi_high.csv'),
+            str('output/comparison/lowi_extreme.csv'),
+            str('output/comparison/lowi_sat_50.csv'),
+            str('output/comparison/lowi_sat_70.csv'),
+            str('output/comparison/lowi_sat_90.csv'),
+            str('output/comparison/lowi_sat_110.csv'),
+        ],
+
+        'PAXOS': [
+            str('output/comparison/paxos_low.csv'),
+            str('output/comparison/paxos_medium.csv'),
+            str('output/comparison/paxos_high.csv'),
+            str('output/comparison/paxos_extreme.csv'),
+            str('output/comparison/paxos_sat_50.csv'),
+            str('output/comparison/paxos_sat_70.csv'),
+            str('output/comparison/paxos_sat_90.csv'),
+            str('output/comparison/paxos_sat_110.csv'),
         ],
     }
-    
-    # Genera il grafico
-    output_path = str(project_root / 'output/latency_vs_throughput_complete.png')
+
+    output_path = str('output/latency_vs_throughput_complete.png')
     plot_comparison(protocols_data, output_path=output_path)

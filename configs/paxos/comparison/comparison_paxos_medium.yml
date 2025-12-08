@@ -1,30 +1,28 @@
 simulation:
-  seed: 42
-  output_file: "output/comparison/pb_medium.csv"
-  duration: 5000
+  output_file: "output/comparison/paxos_medium.csv"
+  duration: 20000  
 network:
   latency_min: 0.2
   latency_max: 1.0
   packet_loss_probability: 0.0
 protocol:
-  name: "primary_backup"
-  settings:
-    replication_factor: 3
+  name: "basic_paxos"
   deployment:
     groups:
-      - role: "PrimaryNode"
+      - role: "ProposerNode"
         start_id: 0
-        count: 1
-      - role: "BackupNode"
-        start_id: 1
-        count: 5
+        count: 2
+
+      - role: "AcceptorNode"
+        start_id: 2
+        count: 4
 workload:
   type: "sequential"
   start_id: 100
   clients: 5                           
   settings:
     num_requests_per_client: 20
-    loop_client_period: 2              
+    loop_client_period: 2
     request_timeout_period: 10
     retry_count: 3
 failures: []

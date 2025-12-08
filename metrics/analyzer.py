@@ -55,7 +55,7 @@ def analyze_csv(csv_path: str) -> Tuple[float, float]:
 
     completed = completed.groupby('request_id').agg({
     'send_time': 'min',
-    'receive_time': 'max'
+    'receive_time': 'min'
     }).reset_index()
     
     print("\n--- DEBUG: Richieste completate (merge) ---")

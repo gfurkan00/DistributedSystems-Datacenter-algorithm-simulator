@@ -8,11 +8,10 @@ import src.protocols.lowi as lowi
 import src.protocols.basic_paxos as basic_paxos
 
 from src.core.logger.logger import Logger, LoggerAPI
-from src.core.oracles import OracleRequest, OracleLeader
+from src.core.oracles import OracleRequest
 from src.core.scheduler.scheduler import Scheduler, SchedulerAPI
 from src.core.network.network import Network, NetworkAPI
 from src.config import ConfigLoader
-from src.core.statistics import Statistics
 from src.service.failure import FailureServiceAPI, FailureService
 from src.service.topology import TopologyServiceAPI, TopologyService
 
@@ -64,6 +63,3 @@ def core(configuration_file: str) -> None:
 
     logger.dump_to_csv(output_path)
     print(f"Logs saved to {output_path}")
-
-    #stats = Statistics(logger.get_logs())
-    #stats.print_report()

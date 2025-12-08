@@ -1,7 +1,7 @@
 [project]
 name = "distributedsystems-datacenter-algorithm-simulator"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "A flexible Discrete Event Simulator for prototyping and evaluating distributed datacenter algorithms."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
