@@ -21,7 +21,7 @@ class Scheduler(SchedulerAPI):
         event = Event(delivery_time=delivery_time, seq=self._seq, callback=callback)
         heapq.heappush(self._events, event)
 
-    def run(self, duration: int = 100) -> None:
+    def run(self, duration: int) -> None:
         print("Simulation Started")
 
         while self._events and duration > 0:

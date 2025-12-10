@@ -1,99 +1,85 @@
+import argparse
 import pandas as pd
-import numpy as np
 
-import matplotlib.pyplot as plt
-from pathlib import Path
-from typing import Tuple, Dict, List
+from dataclasses import dataclass
+from typing import Optional
 
-def extract_request_id(payload: str) -> str:
+TIME_UNIT_TO_SECONDS = 1e-3
+
+
+@dataclass
+class LatencyThroughput:
+    average_latency_ms: float
+    throughput_per_seconds: float
+
+
+def _parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--path", type=str, help="CSV file to analyse")
+    args = parser.parse_args()
+    if not args.path:
+        raise RuntimeError("CSV file not specified")
+    return args
+
+
+def extract_request_id_vectorized(payload_series: pd.Series) -> pd.Series:
+    return payload_series.str.extract(r"'request_id':\s*'([^']+)'")[0]
+
+
+def analyze_csv(csv_path: str) -> Optional[LatencyThroughput]:
     try:
-        if "'request_id':" in payload:
-            parts = payload.split("'request_id': '")
-            if len(parts) > 1:
-                request_id = parts[1].split("'")[0]
-                return request_id
+        df = pd.read_csv(csv_path)
+    except Exception as e:
+        print(f"❌ Errore lettura CSV {csv_path}: {e}")
         return None
-    except:
-        return None  
 
-def analyze_csv(csv_path: str) -> Tuple[float, float]:
-    # Leggi CSV
-    df = pd.read_csv(csv_path)
-    
-    # Estrai richieste inviate
-    requests_sent_raw = df[
+    requests_sent = df[
         (df['event_type'] == 'SEND') &
         (df['message_type'] == 'CLIENT_REQUEST')
-    ][['payload', 'timestamp']]
-    
-    requests_sent_raw['request_id'] = requests_sent_raw['payload'].apply(extract_request_id)
-    requests_sent = requests_sent_raw[['request_id', 'timestamp']].rename(columns={'timestamp': 'send_time'})
-    
-    print("\n--- Richieste inviate ---")
-    print(requests_sent)
-    print(f"Totale richieste inviate: {len(requests_sent)}")
-    
-    # Estrai risposte ricevute
+    ].copy()
+
     responses_received = df[
         (df['event_type'] == 'RECEIVE') &
         (df['message_type'] == 'CLIENT_RESPONSE')
-    ][['payload', 'timestamp']].rename(columns={'timestamp': 'receive_time'})
-    
-    responses_received['request_id'] = responses_received['payload'].apply(extract_request_id)
-    responses_received = responses_received.dropna(subset=['request_id'])
-    responses_received = responses_received[['request_id', 'receive_time']]
-    
-    print("\n---Risposte ricevute ---")
-    print(responses_received)
-    print(f"Totale risposte ricevute: {len(responses_received)}")
-    
+    ].copy()
+
+    requests_sent['request_id'] = extract_request_id_vectorized(requests_sent['payload'])
+    responses_received['request_id'] = extract_request_id_vectorized(responses_received['payload'])
+
+    requests_sent = requests_sent[['request_id', 'timestamp']].rename(columns={'timestamp': 'send_time'})
+    responses_received = responses_received[['request_id', 'timestamp']].rename(columns={'timestamp': 'receive_time'})
+
     completed = pd.merge(requests_sent, responses_received, on='request_id', how='inner')
-    
-    print("\n--- DEBUG: Richieste completate (merge) ---")
-    print(completed)
-    print(f"Totale richieste completate: {len(completed)}")
 
     completed = completed.groupby('request_id').agg({
-    'send_time': 'min',
-    'receive_time': 'min'
+        'send_time': 'min',
+        'receive_time': 'max'
     }).reset_index()
-    
-    print("\n--- DEBUG: Richieste completate (merge) ---")
-    print(completed)
-    print(f"Totale richieste completate: {len(completed)}")
-    
-    # Calcola latenza
-    completed['latency'] = completed['receive_time'] - completed['send_time']
-    
-    print("\n--- DEBUG: Con latenze calcolate ---")
-    print(completed[['request_id', 'send_time', 'receive_time', 'latency']])
-    
-    # Calcola throughput
+
+    num_completed = len(completed)
+    print(f"Requests sent: {len(requests_sent)} | Responses: {len(responses_received)} | Completed: {num_completed}")
+
+
     t_first = completed['send_time'].min()
     t_last = completed['receive_time'].max()
-    duration = t_last - t_first
-    
-    num_completed = len(completed)
-    throughput = num_completed / duration if duration > 0 else 0
-    
-    print(f"\n--- DEBUG: Calcolo throughput ---")
-    print(f"Prima richiesta: {t_first:.4f}s")
-    print(f"Ultima risposta: {t_last:.4f}s")
-    print(f"Durata: {duration:.4f}s")
-    print(f"Richieste completate: {num_completed}")
-    print(f"Throughput: {throughput:.2f} req/s")
-    
-    avg_latency_ms = completed['latency'].mean() * 1000
-    
-    print(f"Latenza media: {avg_latency_ms:.2f} ms")
-    print("-" * 50)
-    
-    return throughput, avg_latency_ms
+    duration_units = t_last - t_first
 
+    duration_seconds = duration_units * TIME_UNIT_TO_SECONDS
+
+    throughput = num_completed / duration_seconds if duration_seconds > 0 else 0
+
+    completed['latency_units'] = completed['receive_time'] - completed['send_time']
+
+    avg_latency_ms = completed['latency_units'].mean()
+
+    return LatencyThroughput(
+        average_latency_ms=avg_latency_ms,
+        throughput_per_seconds=throughput,
+    )
 
 
 if __name__ == '__main__':
-
-    tput_pb, lat_pb = analyze_csv('output/example_primary_backup_furkan.csv')
-    print(f"   Latenza media:  {lat_pb:.2f} ms")
-    print(f"   Throughput:     {tput_pb:.2f} req/s")
+    args = _parse_arguments()
+    metrics = analyze_csv(args.path)
+    print(f"Average Latency: {metrics.average_latency_ms:.4f} ms")
+    print(f"Throughput: {metrics.throughput_per_seconds:.2f} req/s")

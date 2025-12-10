@@ -17,9 +17,13 @@ class ConfigLoader:
 
             network_data = data["network"]
             network_config = NetworkConfig(
-                latency_min=network_data["latency_min"],
-                latency_max=network_data["latency_max"],
-                packet_loss_probability=network_data["packet_loss_probability"],
+                latency_min_wan=network_data["latency_min_wan"],
+                latency_max_wan=network_data["latency_max_wan"],
+                packet_loss_probability_wan=network_data["packet_loss_probability_wan"],
+
+                latency_min_datacenter=network_data.get("latency_min_datacenter"),
+                latency_max_datacenter=network_data.get("latency_max_datacenter"),
+                packet_loss_probability_datacenter=network_data.get("packet_loss_probability_datacenter"),
             )
 
             protocol_data = data["protocol"]

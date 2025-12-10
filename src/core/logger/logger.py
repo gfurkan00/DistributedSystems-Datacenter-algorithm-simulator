@@ -12,7 +12,7 @@ class Logger(LoggerAPI):
         self._logs: List[LoggerEvent] = []
 
     def log(self, timestamp: float, source_node_id: int, event_type: EventType, dest_node_id: Optional[int], message_id: Optional[str], message_type: Optional[MessageType], payload: Optional[Any]):
-        if message_type == MessageType.INTERNAL_LOOP or message_type == MessageType.TIMEOUT_CHECK:
+        if message_type != MessageType.CLIENT_REQUEST and message_type != MessageType.CLIENT_RESPONSE:
             return
 
         logger_event = LoggerEvent(

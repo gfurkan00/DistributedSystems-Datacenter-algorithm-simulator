@@ -36,9 +36,7 @@ def core(configuration_file: str) -> None:
     network: NetworkAPI = Network(
         scheduler=scheduler, 
         logger=logger, 
-        latency_min=config.network_config.latency_min,
-        latency_max=config.network_config.latency_max,
-        packet_loss_probability=config.network_config.packet_loss_probability
+        network_config=config.network_config
     )
 
     topology_service: TopologyServiceAPI = TopologyService(network=network)
