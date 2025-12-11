@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # Assicurati che questi percorsi esistano o adattali
     protocols_data = {
         'Primary-Backup': 'output/saturation/primary-backup/',
-        'LOWI': 'output/saturation/lowi/',
+        #'LOWI': 'output/saturation/lowi/',
         'PAXOS': 'output/saturation/paxos/',
     }
 

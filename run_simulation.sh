@@ -15,14 +15,14 @@ echo ""
 echo "📊 LOWI"
 echo "-------------------------"
 
-for i in "${!LOWI_CONFIGS[@]}"; do
-    config="${LOWI_CONFIGS[$i]}"
-    num=$((i+1))
-    total=${#LOWI_CONFIGS[@]}
-    echo ""
-    echo "[$num/$total] $config..."
-    uv run main.py --config "configs/lowi/saturation/${config}.yml" 2>&1 | tail -8
-done
+#for i in "${!LOWI_CONFIGS[@]}"; do
+#    config="${LOWI_CONFIGS[$i]}"
+#    num=$((i+1))
+#    total=${#LOWI_CONFIGS[@]}
+#    echo ""
+#    echo "[$num/$total] $config..."
+#    uv run main.py --config "configs/lowi/saturation/${config}.yml" 2>&1 | tail -8
+#done
 
 echo""
 echo "📊 PAXOS"

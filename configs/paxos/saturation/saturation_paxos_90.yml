@@ -25,7 +25,7 @@ protocol:
 workload:
   type: "sequential"
   start_id: 100
-  clients: 30
+  clients: 90
   settings:
     num_requests_per_client: 100
     loop_client_period: 200
