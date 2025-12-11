@@ -2,6 +2,8 @@
 
 The **Datacenter Algorithm Simulator** is purely data-driven. Every aspect of the simulation, from network latency to the specific consensus algorithm and failure injection, is defined in a **YAML** configuration file.
 
+In the repository, the configs/ directory contains three example YAML files, one for each of the implemented protocols. These files can be used as starting templates for creating more complex or customized configurations.
+
 To run a simulation, pass the config file path to the main executable:
 
 ```bash
@@ -39,6 +41,11 @@ Controls the execution environment and reproducibility.
 #### Network
 
 Models the physical layer constraints.
+WAN latency represents the delay experienced by a client outside the datacenter, meaning typical Internet latency (higher and more variable).
+Datacenter latency represents communication inside the datacenter, where hardware is local and therefore significantly faster and more stable.
+Similarly, packet loss on the WAN is expected to be higher than on the internal datacenter network.
+
+Datacenter latency and packet-loss parameters are optional because some synchronous protocols (such as LOWI) do not use these physical-layer datacenter values. Instead, they rely solely on the synchronous-latency parameters defined in the specific protocol settings. For these protocols, the datacenter-level network timing is entirely overridden.
 
 | Parameter                            | Type    | Description                                                                                               |
 |--------------------------------------|---------|-----------------------------------------------------------------------------------------------------------|
@@ -55,14 +62,14 @@ Models the physical layer constraints.
 
 Defines the clients interacting with the system.
 
-| Parameter                 | Type     | Description                                                                     |
-|---------------------------|----------|---------------------------------------------------------------------------------|
-| `type`                    | `string` | Workload pattern (e.g. `sequential`)                                            |
-| `clients`                 | `int`    | Number of client nodes to spawn                                                 |
-| `start_id`                | `int`    | (Optional) Starting Integer ID for clients. If omitted, random IDs are assigned |
-| `num_requests_per_client` | `int`    | Total requests sent by one client                                               |
-| `loop_client_period`      | `float`  | Time interval between client loops                                              |
-| `request_timeout_period`  | `float`  | How long a client waits for a response before retrying/failing                  |
+| Parameter                 | Type     | Description                                                                                                              |
+|---------------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
+| `type`                    | `string` | Workload pattern (e.g. `sequential`)                                                                                     |
+| `clients`                 | `int`    | Number of client nodes to spawn                                                                                          |
+| `start_id`                | `int`    | (Optional) Starting Integer ID for clients. If omitted, random IDs are assigned                                          |
+| `num_requests_per_client` | `int`    | Total requests sent by one client (client send one request each loop client period tick, until it reachs this parameter) |
+| `loop_client_period`      | `float`  | Time interval between client loops for sending new request                                                               |
+| `request_timeout_period`  | `float`  | How long a client waits for a response before retrying/failing                                                           |
 
 ---
 
@@ -194,9 +201,13 @@ simulation:
   duration: 1000
 
 network:
-  latency_min: 0.5
-  latency_max: 2.0
-  packet_loss_probability: 0.01
+  latency_min_wan: 0
+  latency_max_wan: 0
+  packet_loss_probability_wan: 0
+
+  latency_min_datacenter: 0.5
+  latency_max_datacenter: 2.0
+  packet_loss_probability_datacenter: 0.01
 
 # ==========================================
 # 2. WORKLOAD (Clients)
