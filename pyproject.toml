@@ -1,0 +1,12 @@
+[project]
+name = "distributedsystems-datacenter-algorithm-simulator"
+version = "1.0.0"
+description = "A flexible Discrete Event Simulator for prototyping and evaluating distributed datacenter algorithms."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.5",
+    "pandas>=2.3.3",
+    "pyyaml>=6.0.3",
+]

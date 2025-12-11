@@ -1,73 +1,135 @@
-# DistributedSystems-Datacenter-algorithm-simulator
+# Datacenter Algorithm Simulator
 
-A discrete-event simulator for datacenter distributed algorithms and consensus protocols.
+## 📑 Index
 
-## Overview
-This simulator allows testing and analyzing distributed systems protocols in a controlled environment with configurable network conditions, node topologies, and workloads.
+- [Description](#-description)
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Installation & Usage](#-installation--usage)
+- [Configuration](#-configuration)
+- [Authors](#-authors)
 
-## Supported Protocols
-- **Primary-Backup Replication** - Simple replication with one primary and multiple backup nodes
-- **Paxos Consensus** - Distributed consensus protocol for agreement among nodes
+---
 
-## Features
-- YAML-based configuration
-- Configurable network latency and packet loss
-- Discrete event scheduling
-- CSV logging for analysis
-- Multiple node types (Client, Primary, Backup, Paxos)
+## 🎯 Description
 
-## Project Structure
-```
+The **Datacenter Algorithm Simulator** is a flexible and extensible framework designed to simulate distributed algorithms within a datacenter environment.
+
+Testing distributed protocols on real hardware is often costly, time-consuming, and difficult to debug. This project aims to solve this by providing a simulation environment that allows for quick prototyping and performance evaluation of both existing and novel replication algorithms.
+
+---
+
+## 🚀 Features
+
+Based on the requirements for modern distributed systems analysis, this simulator supports:
+
+- **Decoupled Architecture:** High separation between the core simulation engine and protocol implementations, allowing developers to add new protocols by simply defining nodes and a topology strategy.
+- **Simple Message Passing:** Protocols use direct send/receive primitives rather than abstract quorum systems.
+- **Synchrony & Asynchrony:** Support for modeling both asynchronous message passing and synchronous protocols.
+- **Accurate Latency Modeling:** Parameters to model end-host processing and network communication delays suitable for high-performance datacenter settings.
+- **Pluggable Protocols:** currently includes implementations for:
+  - _Primary Backup Replication_
+  - _Basic Paxos_
+  - _Looped One-Way Imposition (LOWI)_
+- **Failure Injection:** Built-in services to simulate node failures and network partitions.
+- **Flexible Configuration:** Entire simulations are driven by YAML configuration files.
+
+---
+
+## 📂 Project Structure
+
+The project is organized to separate the simulation core from specific protocol implementations.
+
+```text
 src/
-
+├── config/       # Handles parsing of YAML configuration file
+├── core/         # The heart of the simulator
+│   ├── network/  # Message passing interface and simulated network layer
+│   ├── node/     # Abstract base classes for nodes and clients
+│   ├── oracles/  # Handles usefull data such as leader id (which change dynamically)
+│   ├── logger/   # Centralized logging system
+│   └── scheduler/# Event loop and task scheduling for the simulation
+├── protocols/    # Protocol-specific implementations
+│   ├── basic_paxos/    # Paxos Proposer/Acceptor nodes & Topology Strategy
+│   ├── lowi/           # LOWI nodes & Topology Strategy
+│   ├── primary_backup/ # PB nodes & Topology Strategy
+│   └── topology_factory# Factory pattern to instantiate the correct protocol strategy
+├── service/      # Orchestration services
+│   ├── topology/ # Manages the creation and wiring of nodes based on config
+│   └── failure/  # Manages simulated failures during runtime
+├── metrics/      # Tools for analyzing simulation results (throughput/latency plots)
+└── orchestrator.py # Main driver ensuring services work together
 ```
 
-## Usage
+---
+
+## ⚡ Installation & Usage
+
+This project uses **Python** and manages dependencies using **uv** for high performance.
+
+### Prerequisites
+
+- **Python 3.13+**
+- **uv**
+  > 📥 [Click here for the official uv installation guide](https://docs.astral.sh/uv/getting-started/installation/)
+
+---
+
+### 1. Clone the repository
+
 ```bash
-python main.py -c <configuration.yml>
+git clone https://github.com/gfurkan00/DistributedSystems-Datacenter-algorithm-simulator.git
+cd DistributedSystems-Datacenter-algorithm-simulator
 ```
 
-## Example Configurations
-- `primary_backup.yml` - Primary-backup with 3 backups
-- `paxos_basic.yml` - Paxos consensus with 3 nodes
-- `test_high_latency.yml` - High latency scenarios
-- `test_heavy_workload.yml` - Heavy request load
+### 2. Install dependencies
 
-## Configuration Format
-```yaml
-simulation:
-  seed: 42
-  output_file: "output/results.csv"
+Initialize the virtual environment and sync dependencies:
 
-network:
-  latency_min: 0.5
-  latency_max: 2.0
-  packet_loss_prob: 0.0
-
-nodes:
-  - id: 99
-    type: "ClientNode"
-  - id: 0
-    type: "PaxosNode"
-    config:
-      proposer_ids: [0, 1, 2]
-      acceptor_ids: [0, 1, 2]
-      learner_ids: [0, 1, 2]
-
-workload:
-  type: "sequential"
-  client_id: 99
-  target_id: 0
-  requests:
-    - payload: "Request_1"
-      delay: 0.0
+```bash
+uv sync
 ```
 
-## Output
-Simulation results are saved as CSV files containing:
-- Timestamp
-- Source/destination node IDs
-- Event type (send/receive)
-- Message type
-- Request ID
-- Payload
+### 3. Activate the Virtual Environment
+
+Depending on your operating system, run:
+
+- **Linux / macOS:**
+  ```bash
+  source .venv/bin/activate
+  ```
+- **Windows:**
+  ```bash
+  .venv\Scripts\activate
+  ```
+
+### 4. Run a Simulation
+
+To execute the simulator, use `uv run` pointing to the main entry point and passing a configuration file:
+
+```bash
+uv run main.py -c configs/your_config_file.yml
+```
+
+You can also view all available command-line arguments by running:
+
+```bash
+uv run main.py --help
+```
+
+---
+
+## ⚙️ Configuration
+
+The simulator is fully data-driven. A single YAML file dictates the topology, the protocol to use, network latency settings, and the workload (client requests).
+
+👉 Click [here](./configs/README.md) for the Detailed Configuration Guide.
+
+---
+
+## 👨‍💻 Authors
+
+- **Luca Fantò** - Research Assistant in Distributed Systems and Cloud (ISIN - Institute of Information Systems and Networking)
+- **Furkan Gumus** - Cloud Engineer
+- **Rai Muneeb Ullah Khan**
+- **Petar Eric**

@@ -1,0 +1,37 @@
+simulation:
+  #seed: 42
+  output_file: "output/example_lowi_crash.csv"
+  duration: 100000
+
+network:
+  latency_min_wan: 0
+  latency_max_wan: 0
+  packet_loss_probability_wan: 0
+
+protocol:
+  name: "lowi"
+  settings:
+    loop_leader_period: 0.2
+    timeout_follower_period: 0.5
+    timeout_limit: 2.5
+    sync_latency: 1
+    violation_synchronous_probability: 0.01
+  deployment:
+    groups:
+      - role: "LowiNode"
+        start_id: 0
+        count: 3
+
+workload:
+  type: "sequential"
+  start_id: 100
+  clients: 5
+  settings:
+    num_requests_per_client: 2
+    loop_client_period: 2
+    request_timeout_period: 5
+
+failures:
+  - time: 2.5
+    action: "crash"
+    target: 0

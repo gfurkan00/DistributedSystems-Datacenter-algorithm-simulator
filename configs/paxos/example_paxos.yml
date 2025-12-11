@@ -1,0 +1,35 @@
+simulation:
+  #seed: 1234
+  output_file: "output/example_paxos.csv"
+  duration: 10000
+
+network:
+  latency_min: 0.5
+  latency_max: 2.0
+  packet_loss_probability: 0.01
+
+protocol:
+  name: "basic_paxos"
+  deployment:
+    groups:
+      - role: "ProposerNode"
+        start_id: 0
+        count: 2
+
+      - role: "AcceptorNode"
+        start_id: 2
+        count: 5
+
+workload:
+  type: "sequential"
+  start_id: 100
+  clients: 2
+  settings:
+    num_requests_per_client: 2
+    loop_client_period: 2
+    request_timeout_period: 10
+
+failures:
+  - time: 4.0
+    action: "crash"
+    target: 1

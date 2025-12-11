@@ -1,0 +1,41 @@
+simulation:
+  seed: 42
+  duration_seconds: 10.0
+  output_file: "test_synthetic_output.csv"
+
+network:
+  latency_min: 0.01
+  latency_max: 0.05
+  packet_loss_prob: 0.0
+
+nodes:
+  # Primary Node
+  - id: 0
+    type: "PrimaryNode"
+    config:
+      backup_ids: [1, 2, 3, 4]
+
+  # Backup Nodes
+  - id: 1
+    type: "BackupNode"
+  - id: 2
+    type: "BackupNode"
+  - id: 3
+    type: "BackupNode"
+  - id: 4
+    type: "BackupNode"
+
+  # Client Nodes
+  - id: 5
+    type: "ClientNode"
+  - id: 6
+    type: "ClientNode"
+  - id: 7
+    type: "ClientNode"
+  - id: 8
+    type: "ClientNode"
+
+workload:
+  clients: [5]
+  target_id: 0
+  num_requests: 3

@@ -1,0 +1,69 @@
+from typing import List
+
+import yaml
+
+from .failure_config import FailureEventConfig
+from .protocol_config import ProtocolConfig, NodeGroupConfig
+from .simulation_config import SimulationConfig
+from .network_config import NetworkConfig
+from .workload_config import WorkloadConfig
+
+class ConfigLoader:
+    
+    @staticmethod
+    def load(config_path: str) -> SimulationConfig:
+        with open(config_path, "r") as f:
+            data = yaml.safe_load(f)
+
+            network_data = data["network"]
+            network_config = NetworkConfig(
+                latency_min_wan=network_data["latency_min_wan"],
+                latency_max_wan=network_data["latency_max_wan"],
+                packet_loss_probability_wan=network_data["packet_loss_probability_wan"],
+
+                latency_min_datacenter=network_data.get("latency_min_datacenter"),
+                latency_max_datacenter=network_data.get("latency_max_datacenter"),
+                packet_loss_probability_datacenter=network_data.get("packet_loss_probability_datacenter"),
+            )
+
+            protocol_data = data["protocol"]
+            node_groups = []
+            for node_group in protocol_data["deployment"]["groups"]:
+                node_groups.append(NodeGroupConfig(
+                    role_type=node_group["role"],
+                    start_id=node_group.get("start_id"),
+                    count=node_group["count"]
+                ))
+            protocol_config = ProtocolConfig(
+                name=protocol_data["name"],
+                settings=protocol_data.get("settings"),
+                node_groups=node_groups,
+            )
+
+            workload_data = data.get("workload")
+            workload_config = WorkloadConfig(
+                type=workload_data.get("type", "sequential"),
+                start_id=workload_data.get("start_id"),
+                clients=workload_data.get("clients", 1),
+                settings=workload_data.get("settings"),
+            )
+
+            failures_events: List[FailureEventConfig] = []
+            failures_data = data.get("failures") or []
+            for failure in failures_data:
+                failures_events.append(FailureEventConfig(
+                    time=float(failure["time"]),
+                    action=failure["action"],
+                    target=failure["target"],
+                ))
+
+            sim_data = data["simulation"]
+            return SimulationConfig(
+                seed=sim_data.get("seed"),
+                output_file=sim_data["output_file"],
+                duration=sim_data["duration"],
+                network_config=network_config,
+                protocol_config=protocol_config,
+                workload_config=workload_config,
+                failures=failures_events,
+            )

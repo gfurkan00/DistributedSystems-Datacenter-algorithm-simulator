@@ -1,0 +1,33 @@
+# ASSUMPTION: 1 time unit = 1 µs
+
+simulation:
+  #seed: 42
+  output_file: "output/saturation/paxos/paxos_sat_90.csv"
+  duration: 700000
+network:
+  latency_min_wan: 0
+  latency_max_wan: 0
+  packet_loss_probability_wan: 0
+
+  latency_min_datacenter: 0.001
+  latency_max_datacenter: 0.2
+  packet_loss_probability_datacenter: 0.0001
+protocol:
+  name: "basic_paxos"
+  deployment:
+    groups:
+      - role: "ProposerNode"
+        start_id: 0
+        count: 1
+      - role: "AcceptorNode"
+        start_id: 2
+        count: 5
+workload:
+  type: "sequential"
+  start_id: 100
+  clients: 90
+  settings:
+    num_requests_per_client: 100
+    loop_client_period: 200
+    request_timeout_period: 2000
+    retry_count: 3

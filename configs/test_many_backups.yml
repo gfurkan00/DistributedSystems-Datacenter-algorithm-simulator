@@ -1,0 +1,42 @@
+simulation:
+  seed: 200
+  output_file: "output/test_many_backups.csv"
+
+network:
+  latency_min: 0.5
+  latency_max: 1.0
+  packet_loss_prob: 0.0
+
+nodes:
+  - id: 99
+    type: "ClientNode"
+  - id: 0
+    type: "PrimaryNode"
+    config:
+      backup_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  
+  - id: 1
+    type: "BackupNode"
+  - id: 2
+    type: "BackupNode"
+  - id: 3
+    type: "BackupNode"
+  - id: 4
+    type: "BackupNode"
+  - id: 5
+    type: "BackupNode"
+  - id: 6
+    type: "BackupNode"
+  - id: 7
+    type: "BackupNode"
+  - id: 8
+    type: "BackupNode"
+  - id: 9
+    type: "BackupNode"
+  - id: 10
+    type: "BackupNode"
+
+workload:
+  clients: [99]
+  target_id: 0
+  num_requests: 1
