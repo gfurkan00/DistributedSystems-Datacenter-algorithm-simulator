@@ -40,11 +40,14 @@ Controls the execution environment and reproducibility.
 
 Models the physical layer constraints.
 
-| Parameter                 | Type    | Description                                         |
-|---------------------------|---------|-----------------------------------------------------|
-| `latency_min`             | `float` | Minimum transmission delay (virtual units/ticks)    |
-| `latency_max`             | `float` | Maximum transmission delay (virtual units/ticks)    |
-| `packet_loss_probability` | `float` | Probability (0.0 to 1.0) of a message being dropped |
+| Parameter                            | Type    | Description                                                                                               |
+|--------------------------------------|---------|-----------------------------------------------------------------------------------------------------------|
+| `latency_min_wan`                    | `float` | Minimum transmission delay for WAN client communication to datacenter (virtual units/ticks)               |
+| `latency_max_wan`                    | `float` | Maximum transmission delay for WAN client communication to datacenter (virtual units/ticks)               |
+| `packet_loss_probability_wan`        | `float` | Probability (0.0 to 1.0) of a message being dropped for WAN client communication to datacenter            |
+| `latency_min_datacenter`             | `float` | (Optional) Minimum transmission delay for communication with datacenter Hardware (virtual units/ticks)    |
+| `latency_max_datacenter`             | `float` | (Optional) Maximum transmission delay for communication with datacenter Hardware (virtual units/ticks)    |
+| `packet_loss_probability_datacenter` | `float` | (Optional) Probability (0.0 to 1.0) of a message being dropped for communication with datacenter Hardware |
 
 ---
 
