@@ -131,5 +131,3 @@ The simulator is fully data-driven. A single YAML file dictates the topology, th
 
 - **Luca Fantò** - Research Assistant in Distributed Systems and Cloud (ISIN - Institute of Information Systems and Networking)
 - **Furkan Gumus** - Cloud Engineer
-- **Rai Muneeb Ullah Khan**
-- **Petar Eric**
